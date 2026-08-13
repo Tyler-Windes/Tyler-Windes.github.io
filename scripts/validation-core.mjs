@@ -20,6 +20,7 @@ const manifestPath = join(projectRoot, "validation", "build-manifest.json");
 const contentPath = join(projectRoot, "content", "projects", "workflow-intake-analysis.json");
 const schemaPath = join(projectRoot, "content", "schemas", "public-project-content.schema.json");
 const educationContentPath = join(projectRoot, "content", "site", "education.json");
+const siteConfigPath = join(projectRoot, "content", "site", "site-config.json");
 const educationSchemaPath = join(
   projectRoot,
   "content",
@@ -28,7 +29,8 @@ const educationSchemaPath = join(
 );
 const workflowPath = join(projectRoot, ".github", "workflows", "pages.yml");
 
-const siteOrigin = "https://tyler-windes.github.io";
+const siteConfig = readJson(siteConfigPath);
+const siteOrigin = siteConfig.site_base_url;
 const homeUrl = siteOrigin + "/";
 const projectUrl = siteOrigin + "/projects/workflow-intake-analysis.html";
 const notFoundUrl = siteOrigin + "/404.html";
@@ -54,6 +56,7 @@ const publicInputPaths = [
   "assets/social-preview-1200x630.png",
   "content/projects/workflow-intake-analysis.json",
   "content/site/education.json",
+  "content/site/site-config.json",
   "content/schemas/public-education-content.schema.json",
   "content/schemas/public-project-content.schema.json",
   "package.json",
@@ -192,7 +195,41 @@ export function runPublicValidation({ writeReport = true } = {}) {
   const favicon = readText(join(assetRoot, "favicon.svg"));
   const socialBytes = readFile(join(assetRoot, "social-preview-1200x630.png"));
 
-  check("INPUT_COUNT_EXACT", publicInputPaths.length === 24, "Twenty-four explicit public inputs.");
+  let siteBaseUrlIsAuthorized = false;
+  try {
+    const parsedSiteBaseUrl = new URL(siteOrigin);
+    siteBaseUrlIsAuthorized =
+      parsedSiteBaseUrl.protocol === "https:" &&
+      new Set(["tyler-windes.com", "tylerwindes.com"]).has(parsedSiteBaseUrl.hostname) &&
+      parsedSiteBaseUrl.origin === siteOrigin &&
+      parsedSiteBaseUrl.pathname === "/" &&
+      parsedSiteBaseUrl.search === "" &&
+      parsedSiteBaseUrl.hash === "" &&
+      parsedSiteBaseUrl.username === "" &&
+      parsedSiteBaseUrl.password === "";
+  } catch {
+    siteBaseUrlIsAuthorized = false;
+  }
+
+  check(
+    "SITE_CONFIG_KEYS_EXACT",
+    equalSets(Object.keys(siteConfig), ["schema_version", "site_base_url"]),
+    "The site-address authority contains only its schema version and base URL.",
+  );
+  check(
+    "SITE_BASE_URL_AUTHORIZED",
+    siteConfig.schema_version === "1.0.0" && siteBaseUrlIsAuthorized,
+    "The one current site-base authority is an approved HTTPS apex origin with no trailing slash.",
+  );
+  check(
+    "SITE_BASE_MIGRATION_DOCUMENTED",
+    readme.includes("`content/site/site-config.json`") &&
+      readme.includes("change only `site_base_url`") &&
+      readme.includes("DNS, Cloudflare, and GitHub Pages domain settings remain separate"),
+    "The future one-value base-URL migration and infrastructure boundary are documented.",
+  );
+
+  check("INPUT_COUNT_EXACT", publicInputPaths.length === 25, "Twenty-five explicit public inputs.");
   check("NODE_RUNTIME_FILE", nodeVersion === "24.18.1", "Node.js 24.18.1.");
   check(
     "PACKAGE_RUNTIME",
@@ -229,8 +266,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
   );
   check(
     "SCHEMA_PUBLIC_ID",
-    schema.$id === siteOrigin + "/schemas/public-project-content.schema.json",
-    "Schema has a real public identifier.",
+    schema.$id === "urn:tyler-windes:portfolio:schemas:public-project-content:1.0.0",
+    "Project schema has a stable domain-independent public identifier.",
   );
   check(
     "CONTENT_SCHEMA_CLOSED",
@@ -257,8 +294,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
   );
   check(
     "EDUCATION_SCHEMA_PUBLIC_ID",
-    educationSchema.$id === siteOrigin + "/schemas/public-education-content.schema.json",
-    "Education schema has the exact public identifier.",
+    educationSchema.$id === "urn:tyler-windes:portfolio:schemas:public-education-content:1.0.0",
+    "Education schema has a stable domain-independent public identifier.",
   );
   check(
     "EDUCATION_SCHEMA_CLOSED",
@@ -369,21 +406,38 @@ export function runPublicValidation({ writeReport = true } = {}) {
   );
   check(
     "BUILD_MANIFEST_MODE",
-    manifest.build_mode === "StaticByteCopy" &&
+    manifest.build_mode === "DeterministicSiteBaseUrlGeneration" &&
+      manifest.site_base_url === siteOrigin &&
       equalArrays(manifest.source_roots, ["src", "assets"]) &&
       manifest.output_root === "dist",
-    "Build mode and roots are explicit.",
+    "Build mode, site-base authority, and roots are explicit.",
   );
 
   const manifestByPath = new Map((manifest.entries || []).map((item) => [item.relative_path, item]));
+  const generatedSiteBasePaths = new Set([
+    "404.html",
+    "index.html",
+    "projects/workflow-intake-analysis.html",
+    "robots.txt",
+    "sitemap.xml",
+  ]);
   for (const source of staticSources) {
     const sourceBytes = readFile(source.absolute);
     const builtBytes = readFile(join(distRoot, ...source.relative.split("/")));
     const entry = manifestByPath.get(source.relative);
-    check("BUILD_BYTES_" + safeId(source.relative), sourceBytes.equals(builtBytes), source.relative);
+    const expectedBytes = generatedSiteBasePaths.has(source.relative)
+      ? Buffer.from(sourceBytes.toString("utf8").replaceAll("{{SITE_BASE_URL}}", siteOrigin), "utf8")
+      : sourceBytes;
+    check(
+      "BUILD_BYTES_" + safeId(source.relative),
+      expectedBytes.equals(builtBytes),
+      generatedSiteBasePaths.has(source.relative)
+        ? source.relative + " is deterministically generated from site_base_url."
+        : source.relative,
+    );
     check(
       "BUILD_HASH_" + safeId(source.relative),
-      entry?.size_bytes === sourceBytes.length && entry?.sha256 === sha256(sourceBytes),
+      entry?.size_bytes === expectedBytes.length && entry?.sha256 === sha256(expectedBytes),
       source.relative + " matches its build-manifest identity.",
     );
   }
@@ -391,8 +445,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
   const pages = [
     {
       name: "HOME",
-      absolute: join(sourceRoot, "index.html"),
-      html: readText(join(sourceRoot, "index.html")),
+      absolute: join(distRoot, "index.html"),
+      html: readText(join(distRoot, "index.html")),
       canonical: homeUrl,
       stylesheet: "styles.css",
       favicon: "assets/favicon.svg",
@@ -400,8 +454,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
     },
     {
       name: "PROJECT",
-      absolute: join(sourceRoot, "projects", "workflow-intake-analysis.html"),
-      html: readText(join(sourceRoot, "projects", "workflow-intake-analysis.html")),
+      absolute: join(distRoot, "projects", "workflow-intake-analysis.html"),
+      html: readText(join(distRoot, "projects", "workflow-intake-analysis.html")),
       canonical: projectUrl,
       stylesheet: "../styles.css",
       favicon: "../assets/favicon.svg",
@@ -409,8 +463,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
     },
     {
       name: "NOT_FOUND",
-      absolute: join(sourceRoot, "404.html"),
-      html: readText(join(sourceRoot, "404.html")),
+      absolute: join(distRoot, "404.html"),
+      html: readText(join(distRoot, "404.html")),
       canonical: notFoundUrl,
       stylesheet: "styles.css",
       favicon: "assets/favicon.svg",
@@ -611,17 +665,26 @@ export function runPublicValidation({ writeReport = true } = {}) {
   check(
     "ROBOTS_EXACT",
     robots ===
-      "User-agent: *\nAllow: /\n\nSitemap: https://tyler-windes.github.io/sitemap.xml\n",
+      "User-agent: *\nAllow: /\n\nSitemap: {{SITE_BASE_URL}}/sitemap.xml\n" &&
+      readText(join(distRoot, "robots.txt")).replaceAll("\r\n", "\n") ===
+        "User-agent: *\nAllow: /\n\nSitemap: " + siteOrigin + "/sitemap.xml\n",
     "robots.txt permits indexing and names the exact sitemap.",
   );
   check(
     "SITEMAP_XML",
-    sitemap.startsWith('<?xml version="1.0" encoding="UTF-8"?>') &&
-      sitemap.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">') &&
-      count(sitemap, /<loc>/g) === 2 &&
-      sitemap.includes("<loc>" + homeUrl + "</loc>") &&
-      sitemap.includes("<loc>" + projectUrl + "</loc>") &&
-      !sitemap.includes(notFoundUrl),
+    sitemap.includes("{{SITE_BASE_URL}}/") &&
+      sitemap.includes("{{SITE_BASE_URL}}/projects/workflow-intake-analysis.html") &&
+      (() => {
+        const builtSitemap = readText(join(distRoot, "sitemap.xml"));
+        return (
+          builtSitemap.startsWith('<?xml version="1.0" encoding="UTF-8"?>') &&
+          builtSitemap.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">') &&
+          count(builtSitemap, /<loc>/g) === 2 &&
+          builtSitemap.includes("<loc>" + homeUrl + "</loc>") &&
+          builtSitemap.includes("<loc>" + projectUrl + "</loc>") &&
+          !builtSitemap.includes(notFoundUrl)
+        );
+      })(),
     "Sitemap contains only the home and case-study routes.",
   );
   check("NOJEKYLL_PRESENT", noJekyll.toString("utf8").trim() === "", ".nojekyll is empty.");
@@ -886,7 +949,9 @@ function listFiles(root) {
 
 function validateLinks(sourcePath, html) {
   const idsByFile = new Map();
-  const builtSourcePath = join(distRoot, relative(sourceRoot, sourcePath));
+  const builtSourcePath = sourcePath.startsWith(distRoot)
+    ? sourcePath
+    : join(distRoot, relative(sourceRoot, sourcePath));
   const idsFor = (path) => {
     if (!idsByFile.has(path)) {
       idsByFile.set(path, new Set(allMatches(readText(path), /\bid="([^"]+)"/gi)));

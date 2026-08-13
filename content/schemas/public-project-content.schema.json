@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tyler-windes.github.io/schemas/public-project-content.schema.json",
+  "$id": "urn:tyler-windes:portfolio:schemas:public-project-content:1.0.0",
   "title": "Public project content",
   "type": "object",
   "additionalProperties": false,

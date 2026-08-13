@@ -1,11 +1,11 @@
 # Tyler Windes Portfolio
 
-Source for [tyler-windes.github.io](https://tyler-windes.github.io/), a static professional portfolio focused on systems analysis, workflow validation, SQL-backed evidence, and implementation-ready documentation.
+Source for [tyler-windes.com](https://tyler-windes.com/), a static professional portfolio focused on systems analysis, workflow validation, SQL-backed evidence, and implementation-ready documentation. The GitHub Pages hosting repository remains `Tyler-Windes/Tyler-Windes.github.io`; that repository identity is distinct from the public website identity.
 
 The site currently includes:
 
 - a role-led portfolio home page;
-- a verified [Workflow Intake Analysis Demo](https://tyler-windes.github.io/projects/workflow-intake-analysis.html) case study;
+- a verified [Workflow Intake Analysis Demo](https://tyler-windes.com/projects/workflow-intake-analysis.html) case study;
 - accessible, responsive HTML and CSS with no client-side JavaScript;
 - no analytics, forms, cookies, trackers, runtime APIs, external assets, or direct contact collection.
 
@@ -20,6 +20,12 @@ npm run dev
 ```
 
 `npm run build` copies the committed static source and assets byte-for-byte into `dist/`. `npm run validate` rebuilds the site and checks the source contract, exact source/build parity, route and fragment integrity, canonical and social metadata, robots and sitemap files, accessibility structure, responsive CSS, public URL allowlist, and privacy boundaries.
+
+## Site address authority
+
+`content/site/site-config.json` is the one committed authority for the public site base URL. The build derives canonical URLs, `og:url`, absolute `og:image` URLs, `robots.txt`, `sitemap.xml`, and public schema identifiers from `site_base_url`; validation reads the same authority and checks the generated result. The current value is `https://tyler-windes.com`.
+
+For the later separately authorized move to `https://tylerwindes.com`, change only `site_base_url`, then run the full validation, deployment, redirect, and signed-out readback gates. DNS, Cloudflare, and GitHub Pages domain settings remain separate infrastructure actions. No redirect for `tylerwindes.com` is configured here.
 
 The homepage education section is controlled by `content/site/education.json` and the closed `content/schemas/public-education-content.schema.json` contract. The contract records the University of Denver boot camp as completed technical training and preserves Colorado State University and University of Northern Colorado as coursework, not degrees.
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://tyler-windes.github.io/</loc>
+    <loc>{{SITE_BASE_URL}}/</loc>
   </url>
   <url>
-    <loc>https://tyler-windes.github.io/projects/workflow-intake-analysis.html</loc>
+    <loc>{{SITE_BASE_URL}}/projects/workflow-intake-analysis.html</loc>
   </url>
 </urlset>
