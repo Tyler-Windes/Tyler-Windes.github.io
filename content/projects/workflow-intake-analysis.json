@@ -29,19 +29,16 @@
     { "value": "15", "label": "Named SQL exports" },
     { "value": "12/12", "label": "Report reconciliations" }
   ],
-  "release": {
+  "links": {
     "repository_name": "workflow-intake-analysis-demo",
     "repository_url": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo",
-    "version": "1.0.0",
-    "tag": "v1.0.0",
-    "release_title": "Workflow Intake Analysis Demo v1.0.0",
-    "release_date": "2026-08-13",
-    "release_url": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo/releases/tag/v1.0.0",
-    "public_state": "GitHubReleased",
     "profile_url": "https://github.com/Tyler-Windes"
   },
-  "ai_use": "I used AI-assisted tools to help brainstorm edge cases, draft and refactor parts of the implementation, suggest tests, and audit the code and documentation for consistency. I directed the project, defined the goals and business rules, reviewed the proposed changes and test results, checked the generated outputs, and made the final decisions. I treated AI output as working material rather than evidence; the technical claims are supported by reproducible code, schemas, SQL, automated tests, and reconciled results.",
-  "limitations": "This project uses synthetic data and runs locally. It was designed as a professional-quality demonstration rather than a live production deployment. It does not claim live integrations, production authentication, enterprise-scale operations, or measured business outcomes. Human review remains necessary when a record requires context that the available data does not provide.",
+  "ai_use": "I used AI-assisted tools to brainstorm edge cases, draft and refactor parts of the implementation, suggest tests, and check the code and documentation for consistency. I defined the goals and business rules, reviewed the changes and results, checked the generated outputs, and made the final decisions. The technical claims are supported by reproducible code, schemas, SQL, automated tests, and reconciled results.",
+  "scope": [
+    "This project uses synthetic data and runs locally. It demonstrates analysis, validation, traceability, and documentation practices; it is not a live production deployment and does not claim production integrations, enterprise scale, or measured business outcomes.",
+    "Records that need context remain in review because the available data alone cannot resolve every decision."
+  ],
   "lesson": "A workflow becomes more trustworthy when uncertainty stays visible and every reported result can be traced back to its source and rule.",
   "next_improvement": "I would add configurable rule profiles, reviewer dispositions, and testing over larger synthetic batches before developing a separate production-oriented version."
 }

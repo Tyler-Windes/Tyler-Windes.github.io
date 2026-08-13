@@ -16,9 +16,9 @@
     "design_decisions",
     "primary_skills",
     "results",
-    "release",
+    "links",
     "ai_use",
-    "limitations",
+    "scope",
     "lesson",
     "next_improvement"
   ],
@@ -43,34 +43,27 @@
         "properties": { "value": { "type": "string" }, "label": { "type": "string" } }
       }
     },
-    "release": {
+    "links": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "repository_name",
         "repository_url",
-        "version",
-        "tag",
-        "release_title",
-        "release_date",
-        "release_url",
-        "public_state",
         "profile_url"
       ],
       "properties": {
         "repository_name": { "type": "string", "const": "workflow-intake-analysis-demo" },
         "repository_url": { "type": "string", "const": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo" },
-        "version": { "type": "string", "const": "1.0.0" },
-        "tag": { "type": "string", "const": "v1.0.0" },
-        "release_title": { "type": "string", "const": "Workflow Intake Analysis Demo v1.0.0" },
-        "release_date": { "type": "string", "const": "2026-08-13" },
-        "release_url": { "type": "string", "const": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo/releases/tag/v1.0.0" },
-        "public_state": { "type": "string", "const": "GitHubReleased" },
         "profile_url": { "type": "string", "const": "https://github.com/Tyler-Windes" }
       }
     },
     "ai_use": { "type": "string", "minLength": 180 },
-    "limitations": { "type": "string", "minLength": 180 },
+    "scope": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "string", "minLength": 80 }
+    },
     "lesson": { "type": "string", "minLength": 80 },
     "next_improvement": { "type": "string", "minLength": 100 }
   }

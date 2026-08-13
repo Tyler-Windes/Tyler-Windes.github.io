@@ -34,9 +34,8 @@ const projectUrl = siteOrigin + "/projects/workflow-intake-analysis.html";
 const notFoundUrl = siteOrigin + "/404.html";
 const socialUrl = siteOrigin + "/assets/social-preview-1200x630.png";
 const repositoryUrl = "https://github.com/Tyler-Windes/workflow-intake-analysis-demo";
-const releaseUrl = repositoryUrl + "/releases/tag/v1.0.0";
 const profileUrl = "https://github.com/Tyler-Windes";
-const allowedExternalUrls = new Set([repositoryUrl, releaseUrl, profileUrl]);
+const allowedExternalUrls = new Set([repositoryUrl, profileUrl]);
 const allowedHttpsUrls = new Set([
   ...allowedExternalUrls,
   homeUrl,
@@ -95,24 +94,14 @@ const requiredContentKeys = [
   "design_decisions",
   "primary_skills",
   "results",
-  "release",
+  "links",
   "ai_use",
-  "limitations",
+  "scope",
   "lesson",
   "next_improvement",
 ];
 
-const requiredReleaseKeys = [
-  "repository_name",
-  "repository_url",
-  "version",
-  "tag",
-  "release_title",
-  "release_date",
-  "release_url",
-  "public_state",
-  "profile_url",
-];
+const requiredLinkKeys = ["repository_name", "repository_url", "profile_url"];
 
 const requiredEducationKeys = [
   "$schema",
@@ -251,10 +240,10 @@ export function runPublicValidation({ writeReport = true } = {}) {
     "Schema is closed and requires every public field.",
   );
   check(
-    "RELEASE_SCHEMA_CLOSED",
-    schema.properties?.release?.additionalProperties === false &&
-      equalSets(schema.properties?.release?.required, requiredReleaseKeys),
-    "Release metadata is closed and public-minimal.",
+    "LINKS_SCHEMA_CLOSED",
+    schema.properties?.links?.additionalProperties === false &&
+      equalSets(schema.properties?.links?.required, requiredLinkKeys),
+    "Employer-facing project links are closed and public-minimal.",
   );
   check(
     "EDUCATION_CONTENT_KEYS_EXACT",
@@ -304,22 +293,16 @@ export function runPublicValidation({ writeReport = true } = {}) {
     "Education content matches the approved authority and claim boundary exactly.",
   );
   check(
-    "CONTENT_RELEASE_KEYS_EXACT",
-    equalSets(Object.keys(content.release || {}), requiredReleaseKeys),
-    "Release data omits implementation hashes and internal records.",
+    "CONTENT_LINK_KEYS_EXACT",
+    equalSets(Object.keys(content.links || {}), requiredLinkKeys),
+    "Project links contain the exact public field set.",
   );
   check(
-    "CONTENT_RELEASE_IDENTITY",
-    content.release?.repository_name === "workflow-intake-analysis-demo" &&
-      content.release?.repository_url === repositoryUrl &&
-      content.release?.version === "1.0.0" &&
-      content.release?.tag === "v1.0.0" &&
-      content.release?.release_title === "Workflow Intake Analysis Demo v1.0.0" &&
-      content.release?.release_date === "2026-08-13" &&
-      content.release?.release_url === releaseUrl &&
-      content.release?.public_state === "GitHubReleased" &&
-      content.release?.profile_url === profileUrl,
-    "Repository, release, and profile URLs are exact.",
+    "CONTENT_LINK_IDENTITY",
+    content.links?.repository_name === "workflow-intake-analysis-demo" &&
+      content.links?.repository_url === repositoryUrl &&
+      content.links?.profile_url === profileUrl,
+    "Repository and profile URLs are exact.",
   );
   check("CONTENT_DATA_CLASS", content.data_class === "Synthetic", "Synthetic.");
   check(
@@ -343,16 +326,19 @@ export function runPublicValidation({ writeReport = true } = {}) {
   );
   check(
     "CONTENT_AI_ACCOUNTABILITY",
-    content.ai_use?.includes("I directed the project") &&
+    content.ai_use?.includes("defined the goals and business rules") &&
       content.ai_use?.includes("made the final decisions") &&
-      content.ai_use?.includes("working material rather than evidence"),
-    "AI assistance remains subordinate to Tyler's judgment.",
+      content.ai_use?.includes("reproducible code"),
+    "AI assistance remains subordinate to Tyler's direction and reproducible evidence.",
   );
   check(
-    "CONTENT_LIMITATIONS",
-    content.limitations?.includes("synthetic data") &&
-      content.limitations?.includes("Human review remains necessary"),
-    "The limitations contract remains explicit.",
+    "CONTENT_SCOPE_TWO_PARAGRAPHS",
+    Array.isArray(content.scope) &&
+      content.scope.length === 2 &&
+      content.scope[0].includes("synthetic data") &&
+      content.scope[0].includes("not a live production deployment") &&
+      content.scope[1].includes("remain in review"),
+    "Scope is stated in two concise employer-facing paragraphs.",
   );
 
   const staticSources = [
@@ -538,11 +524,10 @@ export function runPublicValidation({ writeReport = true } = {}) {
     "Homepage exposes one discreet GitHub profile route.",
   );
   check(
-    "PROJECT_RELEASE_LINKS",
+    "PROJECT_LINKS",
     project.includes('href="' + repositoryUrl + '"') &&
-      project.includes('href="' + releaseUrl + '"') &&
       project.includes('href="' + profileUrl + '"'),
-    "Case study links to the exact repository, release, and profile.",
+    "Case study links to the exact repository and profile.",
   );
   check(
     "PROJECT_OWNER_WORDING",
@@ -556,15 +541,22 @@ export function runPublicValidation({ writeReport = true } = {}) {
   check(
     "PROJECT_HUMAN_LED_AI_USE",
     count(project, /id="ai-use"/g) === 1 &&
-      project.includes("I directed the project") &&
+      project.includes("defined the goals and business rules") &&
       project.includes("made the final decisions"),
     "One human-directed AI-use section.",
   );
   check(
-    "PROJECT_ONE_LIMITATIONS",
-    count(project, /<section[^>]+id="limitations"/g) === 1 &&
-      project.includes(content.limitations),
-    "One concise limitations section.",
+    "PROJECT_ONE_SCOPE_SECTION",
+    count(project, /<section[^>]+id="scope"/g) === 1 &&
+      content.scope.every((paragraph) => project.includes(paragraph)),
+    "One concise scope section.",
+  );
+  check(
+    "NO_VISIBLE_RELEASE_MECHANICS",
+    !/(?:releases\/tag|v1\.0\.0|verified github release|released on github|version 1\.0\.0|read the v1\.0\.0 release)/i.test(
+      combinedHtml,
+    ),
+    "Employer-facing routes omit project and site release mechanics.",
   );
   check(
     "PROJECT_CLAIM_BOUNDARY",
