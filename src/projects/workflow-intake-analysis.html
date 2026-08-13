@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workflow Intake Analysis Demo | Tyler Windes</title>
+  <meta name="description" content="A practical Python and SQL workflow for turning inconsistent synthetic intake into validated, traceable results.">
+  <meta name="robots" content="index, follow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#173f36">
+  <link rel="canonical" href="https://tyler-windes.github.io/projects/workflow-intake-analysis.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Tyler Windes Portfolio">
+  <meta property="og:title" content="Workflow Intake Analysis Demo">
+  <meta property="og:description" content="A practical Python and SQL workflow for turning inconsistent synthetic intake into validated, traceable results.">
+  <meta property="og:url" content="https://tyler-windes.github.io/projects/workflow-intake-analysis.html">
+  <meta property="og:image" content="https://tyler-windes.github.io/assets/social-preview-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tyler Windes — Technical Consultant and Systems Analyst">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="../index.html" aria-label="Return to Tyler Windes portfolio home">
+        <span class="brand-mark" aria-hidden="true">TW</span>
+        <span>Tyler Windes</span>
+      </a>
+      <nav aria-label="Case study navigation">
+        <ul class="nav-list">
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#decisions">Decisions</a></li>
+          <li><a href="#evidence">Evidence</a></li>
+          <li><a href="#lessons">Lessons</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="project-hero" aria-labelledby="project-title">
+      <div class="shell project-hero-inner">
+        <a class="breadcrumb" href="../index.html">← Portfolio home</a>
+        <p class="eyebrow">Python · SQL · Systems analysis · Synthetic data</p>
+        <h1 id="project-title">Workflow Intake Analysis Demo</h1>
+        <p class="hero-lead">A practical Python and SQL workflow for turning inconsistent synthetic intake into validated, traceable results.</p>
+        <dl class="project-facts" aria-label="Project facts">
+          <div><dt>Input</dt><dd>30 synthetic records</dd></div>
+          <div><dt>Disposition</dt><dd>21 validated · 9 review</dd></div>
+          <div><dt>Analysis</dt><dd>SQLite and 15 SQL exports</dd></div>
+          <div><dt>Traceability</dt><dd>420 field-level rows</dd></div>
+        </dl>
+        <div class="release-card" aria-labelledby="release-title">
+          <div>
+            <p class="project-context">Verified GitHub release</p>
+            <h2 id="release-title">Version 1.0.0 · August 13, 2026</h2>
+          </div>
+          <div class="release-links">
+            <a class="button button-primary" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo">View repository</a>
+            <a class="button button-secondary" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo/releases/tag/v1.0.0">View v1.0.0 release</a>
+            <a class="text-link" href="https://github.com/Tyler-Windes">View GitHub profile <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="case-toc" aria-label="On this page">
+      <div class="shell">
+        <p class="toc-title">On this page</p>
+        <ol>
+          <li><a href="#why">Why I built it</a></li>
+          <li><a href="#problem">The problem</a></li>
+          <li><a href="#decisions">Design decisions</a></li>
+          <li><a href="#workflow">Workflow</a></li>
+          <li><a href="#evidence">Evidence</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#ai-use">AI use</a></li>
+          <li><a href="#limitations">Limitations</a></li>
+          <li><a href="#lessons">Lessons</a></li>
+        </ol>
+      </div>
+    </nav>
+
+    <section class="section case-section" id="why" aria-labelledby="why-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">Why I built it</p>
+          <h2 id="why-title">A business question carried through to working proof</h2>
+        </div>
+        <div class="case-copy">
+          <p>I built this project to show how I approach inconsistent operational data: define the business rules, preserve uncertainty, separate records that are ready for use from those that require review, and produce results that can be traced back to their source.</p>
+          <p>I wanted the project to show that I can translate an ambiguous business problem into clear requirements, validation logic, SQL-backed analysis, tested technical outputs, and documentation that both technical and business stakeholders can use.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="problem" aria-labelledby="problem-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">The problem</p>
+          <h2 id="problem-title">Clean-looking data can hide unsupported assumptions</h2>
+        </div>
+        <div class="case-copy">
+          <p>Inconsistent intake data can create false confidence. An unknown value may be silently converted into an affirmative fact, while records that still require context may be mixed into the same dataset as records that are ready for reporting.</p>
+          <blockquote class="judgment-call">
+            <p>One issue that stood out to me was how an unknown boolean value was handled. Converting an unclear value to true may make the record easier to process, but it also invents a fact that was not present in the source. I decided that the uncertainty needed to remain visible and the record should be routed for review instead.</p>
+          </blockquote>
+          <p>That reflects how I approach analysis more broadly: I would rather preserve an honest uncertainty than create a cleaner result that cannot be supported.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="decisions" aria-labelledby="decisions-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Design decisions</p>
+          <h2 id="decisions-title">Keep usable records reliable without hiding the exceptions</h2>
+          <p>Two decisions shaped the rest of the data model, reporting, and test strategy.</p>
+        </div>
+        <div class="decision-grid">
+          <article class="decision-card">
+            <p class="decision-number">01</p>
+            <h3>Separate validated and review-required records</h3>
+            <p>I designed distinct surfaces so questionable input remains visible without weakening what “validated” means. All 30 records stay available; 21 meet the defined contract and 9 remain ready for human review.</p>
+          </article>
+          <article class="decision-card">
+            <p class="decision-number">02</p>
+            <h3>Preserve raw and normalized values together</h3>
+            <p>I kept the source value next to its normalized value, rule, finding, and output identity. A reviewer can see what changed, why it changed, and where the result went.</p>
+          </article>
+        </div>
+        <p class="decision-summary">Together, these choices prevent the workflow from manufacturing certainty. They make reliable records usable while preserving the records that still need judgment or context.</p>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="workflow" aria-labelledby="workflow-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Workflow and implementation</p>
+          <h2 id="workflow-title">One rule core, several ways to inspect the result</h2>
+          <p>I implemented the batch pipeline and bounded local API over the same normalization and validation rules so the behavior stays consistent.</p>
+        </div>
+        <figure class="evidence-visual" aria-labelledby="workflow-caption">
+          <figcaption id="workflow-caption"><strong>Intake-to-evidence flow</strong><span>Original values remain connected throughout</span></figcaption>
+          <ol class="workflow-flow">
+            <li><span class="flow-number">01</span><strong>Synthetic intake</strong><small>Preserved source rows</small></li>
+            <li><span class="flow-number">02</span><strong>Normalize</strong><small>Known mappings only</small></li>
+            <li><span class="flow-number">03</span><strong>Validate</strong><small>Schemas and business rules</small></li>
+            <li><span class="flow-number">04</span><strong>Route</strong><small>Validated or review required</small></li>
+            <li><span class="flow-number">05</span><strong>Analyze</strong><small>SQLite and named SQL</small></li>
+            <li><span class="flow-number">06</span><strong>Reconcile</strong><small>Reports, tests, and traceability</small></li>
+          </ol>
+          <details class="text-alternative">
+            <summary>Text alternative</summary>
+            <p>Thirty synthetic source records pass through shared normalization and validation rules. Known values are normalized while unknown values remain visible. Records that meet the final contract are separated from those requiring review. SQLite and named SQL make both groups queryable, while reports, tests, and field-level traceability reconcile the reported result to the source.</p>
+          </details>
+        </figure>
+        <div class="implementation-grid">
+          <article><h3>Requirements first</h3><p>I defined the source fields, controlled values, conditional rules, cross-record checks, and acceptance behavior before treating the output as valid.</p></article>
+          <article><h3>Shared validation</h3><p>Python and JSON Schema enforce the same contract across batch processing and the bounded local API.</p></article>
+          <article><h3>Queryable review</h3><p>SQLite keeps validated and review-required records distinct while retaining source locators and findings.</p></article>
+          <article><h3>Reproducible reporting</h3><p>Named SQL exports and generated summaries reconcile against the controlled data instead of relying on copied totals.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Validated evidence</p>
+          <h2 id="evidence-title">The result is useful because it can be checked</h2>
+          <p>The figures describe the controlled synthetic sample and its reconciled outputs; they are not business-impact claims.</p>
+        </div>
+        <div class="metric-grid" aria-label="Project evidence results">
+          <article><strong>30</strong><span>Synthetic intake records</span></article>
+          <article><strong>21</strong><span>Validated records</span></article>
+          <article><strong>9</strong><span>Review-required records</span></article>
+          <article><strong>420</strong><span>Field-level traceability rows</span></article>
+          <article><strong>15</strong><span>Named SQL exports</span></article>
+          <article><strong>12/12</strong><span>Report reconciliations</span></article>
+        </div>
+        <div class="evidence-copy">
+          <p>I tested required fields, controlled values, dates, ownership and closure rules, duplicate identities and references, schema behavior, SQLite integrity, SQL execution, report totals, and API contracts. Deterministic checks also guard against stale, missing, or unexpected generated outputs.</p>
+          <p>The traceability surface connects source location, original value, normalized value, rule, finding, and output identity. That lets a reviewer move from a reported result back to the exact data and reasoning behind it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="skills" aria-labelledby="skills-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Skills demonstrated</p>
+          <h2 id="skills-title">Business analysis carried through implementation and review</h2>
+        </div>
+        <div class="skills-grid">
+          <article><h3>Systems analysis</h3><p>Framed the workflow, stakeholders, constraints, decisions, and failure modes.</p></article>
+          <article><h3>Requirements and acceptance</h3><p>Converted the problem into testable business rules and expected behavior.</p></article>
+          <article><h3>Data-quality validation</h3><p>Handled missing, unknown, inconsistent, conditional, and cross-record values explicitly.</p></article>
+          <article><h3>SQL and reconciliation</h3><p>Created queryable surfaces and checked every reported count against controlled data.</p></article>
+          <article><h3>Traceable communication</h3><p>Connected business intent to rules, code, findings, SQL, tests, and readable documentation.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="ai-use" aria-labelledby="ai-use-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">AI-assisted, human-directed</p>
+          <h2 id="ai-use-title">Working material is not evidence</h2>
+        </div>
+        <div class="case-copy">
+          <p>I used AI-assisted tools to help brainstorm edge cases, draft and refactor parts of the implementation, suggest tests, and audit the code and documentation for consistency. I directed the project, defined the goals and business rules, reviewed the proposed changes and test results, checked the generated outputs, and made the final decisions.</p>
+          <p>I treated AI output as working material rather than evidence. The technical claims are supported by reproducible code, schemas, SQL, automated tests, and reconciled results that can be checked directly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section limits-section case-section" id="limitations" aria-labelledby="limitations-title">
+      <div class="shell bridge-grid">
+        <div>
+          <p class="eyebrow eyebrow-light">Limitations</p>
+          <h2 id="limitations-title">A professional-quality demonstration with clear boundaries</h2>
+        </div>
+        <div class="bridge-copy">
+          <p>This project uses synthetic data and runs locally. It was designed as a professional-quality demonstration rather than a live production deployment. It does not claim live integrations, production authentication, enterprise-scale operations, or measured business outcomes. Human review remains necessary when a record requires context that the available data does not provide.</p>
+          <p>The analysis, design, testing, documentation, and validation practices are intended to reflect the quality of work applicable to real business and implementation settings.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="lessons" aria-labelledby="lessons-title">
+      <div class="shell lesson-grid">
+        <article>
+          <p class="eyebrow">What I learned</p>
+          <h2 id="lessons-title">Trust grows when uncertainty stays visible</h2>
+          <p>A workflow becomes more trustworthy when uncertainty stays visible and every reported result can be traced back to its source and rule.</p>
+        </article>
+        <article class="next-step">
+          <p class="eyebrow">What I would add next</p>
+          <h3>More flexible review without weakening the contract</h3>
+          <p>I would add configurable rule profiles, reviewer dispositions, and testing over larger synthetic batches before developing a separate production-oriented version.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p>Tyler Windes · Workflow Intake Analysis Demo</p>
+      <p><a href="../index.html">Return to portfolio</a> · <a href="https://github.com/Tyler-Windes">GitHub profile</a></p>
+    </div>
+  </footer>
+</body>
+</html>
