@@ -1,0 +1,24 @@
+{
+  "$schema": "../schemas/public-education-content.schema.json",
+  "schema_version": "1.0.0",
+  "section_heading": "Education & Technical Training",
+  "context": "My education combines a business foundation with hands-on technical training that supports my work across systems, workflows, data quality, and technical problem solving.",
+  "items": [
+    {
+      "classification": "Degree",
+      "institution": "Front Range Community College",
+      "detail": "Associate of Arts with Business Designation, 2015"
+    },
+    {
+      "classification": "CompletedTechnicalTraining",
+      "institution": "University of Denver",
+      "detail": "Cybersecurity Boot Camp, 240-hour completed program, 2022"
+    },
+    {
+      "classification": "CourseworkNotDegree",
+      "institution": "Additional coursework",
+      "detail": "Additional coursework at Colorado State University and the University of Northern Colorado"
+    }
+  ],
+  "claim_boundary": "Cybersecurity is a supporting technical foundation only where accurately represented. Colorado State University and the University of Northern Colorado are coursework, not degrees."
+}

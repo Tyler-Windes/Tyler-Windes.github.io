@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tyler-windes.github.io/schemas/public-education-content.schema.json",
+  "title": "Public portfolio education and technical-training content",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "section_heading",
+    "context",
+    "items",
+    "claim_boundary"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/public-education-content.schema.json"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "section_heading": {
+      "const": "Education & Technical Training"
+    },
+    "context": {
+      "const": "My education combines a business foundation with hands-on technical training that supports my work across systems, workflows, data quality, and technical problem solving."
+    },
+    "items": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "institution", "detail"],
+          "properties": {
+            "classification": { "const": "Degree" },
+            "institution": { "const": "Front Range Community College" },
+            "detail": { "const": "Associate of Arts with Business Designation, 2015" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "institution", "detail"],
+          "properties": {
+            "classification": { "const": "CompletedTechnicalTraining" },
+            "institution": { "const": "University of Denver" },
+            "detail": { "const": "Cybersecurity Boot Camp, 240-hour completed program, 2022" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "institution", "detail"],
+          "properties": {
+            "classification": { "const": "CourseworkNotDegree" },
+            "institution": { "const": "Additional coursework" },
+            "detail": { "const": "Additional coursework at Colorado State University and the University of Northern Colorado" }
+          }
+        }
+      ],
+      "items": false
+    },
+    "claim_boundary": {
+      "const": "Cybersecurity is a supporting technical foundation only where accurately represented. Colorado State University and the University of Northern Colorado are coursework, not degrees."
+    }
+  }
+}

@@ -639,6 +639,12 @@ dd {
   border-bottom: 1px solid var(--line);
 }
 
+.education-list .education-featured {
+  padding-inline: calc(1rem - 3px) 1rem;
+  background: rgba(219, 234, 228, 0.48);
+  border-left: 3px solid var(--accent);
+}
+
 .education-list h3,
 .education-list p {
   margin-bottom: 0;
@@ -646,6 +652,16 @@ dd {
 
 .education-list p {
   color: var(--ink-soft);
+}
+
+.education-list .education-type {
+  margin-bottom: 0.35rem;
+  color: var(--signal);
+  font-size: var(--step--1);
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .site-footer {

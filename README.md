@@ -21,6 +21,8 @@ npm run dev
 
 `npm run build` copies the committed static source and assets byte-for-byte into `dist/`. `npm run validate` rebuilds the site and checks the source contract, exact source/build parity, route and fragment integrity, canonical and social metadata, robots and sitemap files, accessibility structure, responsive CSS, public URL allowlist, and privacy boundaries.
 
+The homepage education section is controlled by `content/site/education.json` and the closed `content/schemas/public-education-content.schema.json` contract. The contract records the University of Denver boot camp as completed technical training and preserves Colorado State University and University of Northern Colorado as coursework, not degrees.
+
 ## Deployment
 
 GitHub Pages deploys only from validated pushes to `main`. Pull requests run the same public validation without deploying. The workflow uses least-privilege job permissions, the `github-pages` environment, deployment concurrency, and immutable action commit pins.

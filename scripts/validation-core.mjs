@@ -19,6 +19,13 @@ const reportPath = join(projectRoot, "validation", "public-validation.json");
 const manifestPath = join(projectRoot, "validation", "build-manifest.json");
 const contentPath = join(projectRoot, "content", "projects", "workflow-intake-analysis.json");
 const schemaPath = join(projectRoot, "content", "schemas", "public-project-content.schema.json");
+const educationContentPath = join(projectRoot, "content", "site", "education.json");
+const educationSchemaPath = join(
+  projectRoot,
+  "content",
+  "schemas",
+  "public-education-content.schema.json",
+);
 const workflowPath = join(projectRoot, ".github", "workflows", "pages.yml");
 
 const siteOrigin = "https://tyler-windes.github.io";
@@ -47,6 +54,8 @@ const publicInputPaths = [
   "assets/favicon.svg",
   "assets/social-preview-1200x630.png",
   "content/projects/workflow-intake-analysis.json",
+  "content/site/education.json",
+  "content/schemas/public-education-content.schema.json",
   "content/schemas/public-project-content.schema.json",
   "package.json",
   "scripts/build.mjs",
@@ -105,6 +114,38 @@ const requiredReleaseKeys = [
   "profile_url",
 ];
 
+const requiredEducationKeys = [
+  "$schema",
+  "schema_version",
+  "section_heading",
+  "context",
+  "items",
+  "claim_boundary",
+];
+const requiredEducationItemKeys = ["classification", "institution", "detail"];
+const exactEducationHeading = "Education & Technical Training";
+const exactEducationContext =
+  "My education combines a business foundation with hands-on technical training that supports my work across systems, workflows, data quality, and technical problem solving.";
+const exactEducationItems = [
+  {
+    classification: "Degree",
+    institution: "Front Range Community College",
+    detail: "Associate of Arts with Business Designation, 2015",
+  },
+  {
+    classification: "CompletedTechnicalTraining",
+    institution: "University of Denver",
+    detail: "Cybersecurity Boot Camp, 240-hour completed program, 2022",
+  },
+  {
+    classification: "CourseworkNotDegree",
+    institution: "Additional coursework",
+    detail: "Additional coursework at Colorado State University and the University of Northern Colorado",
+  },
+];
+const exactEducationBoundary =
+  "Cybersecurity is a supporting technical foundation only where accurately represented. Colorado State University and the University of Northern Colorado are coursework, not degrees.";
+
 const actionPins = [
   {
     name: "actions/checkout",
@@ -145,6 +186,8 @@ export function runPublicValidation({ writeReport = true } = {}) {
 
   const content = readJson(contentPath);
   const schema = readJson(schemaPath);
+  const educationContent = readJson(educationContentPath);
+  const educationSchema = readJson(educationSchemaPath);
   const manifest = readJson(manifestPath);
   const packageJson = readJson(join(projectRoot, "package.json"));
   const workflow = readText(workflowPath);
@@ -160,7 +203,7 @@ export function runPublicValidation({ writeReport = true } = {}) {
   const favicon = readText(join(assetRoot, "favicon.svg"));
   const socialBytes = readFile(join(assetRoot, "social-preview-1200x630.png"));
 
-  check("INPUT_COUNT_EXACT", publicInputPaths.length === 22, "Twenty-two explicit public inputs.");
+  check("INPUT_COUNT_EXACT", publicInputPaths.length === 24, "Twenty-four explicit public inputs.");
   check("NODE_RUNTIME_FILE", nodeVersion === "24.18.1", "Node.js 24.18.1.");
   check(
     "PACKAGE_RUNTIME",
@@ -212,6 +255,53 @@ export function runPublicValidation({ writeReport = true } = {}) {
     schema.properties?.release?.additionalProperties === false &&
       equalSets(schema.properties?.release?.required, requiredReleaseKeys),
     "Release metadata is closed and public-minimal.",
+  );
+  check(
+    "EDUCATION_CONTENT_KEYS_EXACT",
+    equalSets(Object.keys(educationContent), requiredEducationKeys),
+    "Education content contains the exact documented field set.",
+  );
+  check(
+    "EDUCATION_SCHEMA_REFERENCE",
+    educationContent.$schema === "../schemas/public-education-content.schema.json",
+    "Education content uses the committed local schema.",
+  );
+  check(
+    "EDUCATION_SCHEMA_PUBLIC_ID",
+    educationSchema.$id === siteOrigin + "/schemas/public-education-content.schema.json",
+    "Education schema has the exact public identifier.",
+  );
+  check(
+    "EDUCATION_SCHEMA_CLOSED",
+    educationSchema.additionalProperties === false &&
+      equalSets(educationSchema.required, requiredEducationKeys),
+    "Education schema requires the complete field set and rejects undocumented fields.",
+  );
+  const educationItemSchemas = educationSchema.properties?.items?.prefixItems || [];
+  check(
+    "EDUCATION_ITEM_SCHEMA_EXACT",
+    educationSchema.properties?.items?.minItems === 3 &&
+      educationSchema.properties?.items?.maxItems === 3 &&
+      educationSchema.properties?.items?.items === false &&
+      educationItemSchemas.length === 3 &&
+      educationItemSchemas.every(
+        (itemSchema, index) =>
+          itemSchema.additionalProperties === false &&
+          equalSets(itemSchema.required, requiredEducationItemKeys) &&
+          itemSchema.properties?.classification?.const === exactEducationItems[index].classification &&
+          itemSchema.properties?.institution?.const === exactEducationItems[index].institution &&
+          itemSchema.properties?.detail?.const === exactEducationItems[index].detail,
+      ),
+    "Education schema fixes the exact degree, training, and coursework records.",
+  );
+  check(
+    "EDUCATION_CONTENT_EXACT",
+    educationContent.section_heading === exactEducationHeading &&
+      educationContent.context === exactEducationContext &&
+      educationContent.claim_boundary === exactEducationBoundary &&
+      Array.isArray(educationContent.items) &&
+      JSON.stringify(educationContent.items) === JSON.stringify(exactEducationItems),
+    "Education content matches the approved authority and claim boundary exactly.",
   );
   check(
     "CONTENT_RELEASE_KEYS_EXACT",
@@ -485,14 +575,38 @@ export function runPublicValidation({ writeReport = true } = {}) {
       ),
     "Synthetic scope is explicit and unsupported outcomes are absent.",
   );
+  const educationSection =
+    home.match(/<section\s+class="section section-tinted"\s+id="education"[\s\S]*?<\/section>/i)?.[0] ||
+    "";
   check(
-    "EDUCATION_EXACT",
-    home.includes("Associate of Arts with Business Designation, 2015") &&
-      home.includes("Cybersecurity Boot Camp, 240-hour completed program, 2022") &&
-      home.includes(
-        "Additional coursework at Colorado State University and the University of Northern Colorado",
+    "EDUCATION_RENDERED_EXACT",
+    educationSection.includes('<h2 id="education-title">Education &amp; Technical Training</h2>') &&
+      educationSection.includes(exactEducationContext) &&
+      exactEducationItems.every(
+        (item) =>
+          educationSection.includes("<h3>" + item.institution + "</h3>") &&
+          educationSection.includes("<p>" + item.detail + "</p>"),
       ),
-    "Reviewed education wording remains exact.",
+    "The approved education heading, context, institutions, and exact facts are rendered.",
+  );
+  check(
+    "EDUCATION_STRUCTURE",
+    count(educationSection, /<article\b/gi) === 3 &&
+      count(educationSection, /<h3\b/gi) === 3 &&
+      count(educationSection, /class="education-featured"/gi) === 1 &&
+      educationSection.indexOf("Front Range Community College") <
+        educationSection.indexOf("University of Denver") &&
+      educationSection.indexOf("University of Denver") <
+        educationSection.indexOf("Additional coursework"),
+    "Three ordered education records render, with technical training emphasized once.",
+  );
+  check(
+    "EDUCATION_NO_CYBER_PIVOT_OR_INFERRED_CURRICULUM",
+    count(educationSection, /Cybersecurity/gi) === 1 &&
+      !/\b(?:SOC|security operations|networking|Linux|cloud|penetration testing|incident response)\b/i.test(
+        educationSection,
+      ),
+    "The credential supports the broader technical story without inferred curriculum or cyber-specialist positioning.",
   );
   check(
     "NOT_FOUND_USEFUL",
@@ -589,6 +703,7 @@ export function runPublicValidation({ writeReport = true } = {}) {
   const readerFacing = [
     combinedHtml,
     JSON.stringify(content),
+    JSON.stringify(educationContent),
     readme,
     robots,
     sitemap,
