@@ -659,6 +659,55 @@ dd {
   text-transform: uppercase;
 }
 
+.conversation-section {
+  padding-block: clamp(3rem, 6vw, 5rem);
+}
+
+.conversation-panel {
+  display: grid;
+  padding-top: clamp(1.75rem, 4vw, 2.75rem);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.conversation-copy {
+  max-width: 44rem;
+}
+
+.conversation-copy h2 {
+  margin-bottom: 0.75rem;
+  font-size: var(--step-2);
+}
+
+.conversation-copy p {
+  margin-bottom: 0;
+  color: var(--ink-soft);
+}
+
+.conversation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem 1.25rem;
+}
+
+.conversation-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--accent-deep);
+  border-bottom: 1px solid rgba(32, 92, 79, 0.35);
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.conversation-link:hover {
+  border-bottom-color: var(--accent);
+}
+
 .site-footer {
   padding-block: 1.6rem;
   color: #becfc8;
@@ -1034,9 +1083,14 @@ dd {
   .approach-grid,
   .case-grid,
   .bridge-grid,
+  .conversation-panel,
   .project-feature,
   .lesson-grid {
     grid-template-columns: 1fr;
+  }
+
+  .conversation-actions {
+    justify-content: flex-start;
   }
 
   .hero-grid {

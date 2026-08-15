@@ -37,7 +37,12 @@ const notFoundUrl = siteOrigin + "/404.html";
 const socialUrl = siteOrigin + "/assets/social-preview-1200x630.png";
 const repositoryUrl = "https://github.com/Tyler-Windes/workflow-intake-analysis-demo";
 const profileUrl = "https://github.com/Tyler-Windes";
-const allowedExternalUrls = new Set([repositoryUrl, profileUrl]);
+const linkedInUrl = "https://www.linkedin.com/in/tylerwindes";
+const exactBackgroundFirstParagraph =
+  "My background combines independent technical analysis with regulated business operations and years of client-facing problem solving. I translate that experience into requirements, data rules, technical documentation, and handoffs that business and technical teams can use.";
+const exactConversationHeading = "Continue the conversation";
+const exactConversationBody = "Review my work on GitHub or connect with me on LinkedIn.";
+const allowedExternalUrls = new Set([repositoryUrl, profileUrl, linkedInUrl]);
 const allowedHttpsUrls = new Set([
   ...allowedExternalUrls,
   homeUrl,
@@ -546,7 +551,7 @@ export function runPublicValidation({ writeReport = true } = {}) {
     check(
       page.name + "_EXTERNAL_ALLOWLIST",
       externalLinks.every((url) => allowedHttpsUrls.has(url)),
-      "Every external link is an approved HTTPS GitHub URL.",
+      "Every external link is an approved HTTPS GitHub, LinkedIn, or site URL.",
     );
     check(
       page.name + "_LINKS_AND_FRAGMENTS",
@@ -621,6 +626,18 @@ export function runPublicValidation({ writeReport = true } = {}) {
       ),
     "Synthetic scope is explicit and unsupported outcomes are absent.",
   );
+  const experienceSection =
+    home.match(/<section\s+class="section bridge-section"\s+id="experience"[\s\S]*?<\/section>/i)?.[0] ||
+    "";
+  check(
+    "BACKGROUND_COPY_EXACT",
+    experienceSection.includes("<p>" + exactBackgroundFirstParagraph + "</p>") &&
+      home.split(exactBackgroundFirstParagraph).length - 1 === 1 &&
+      !home.includes(
+        "My professional background spans regulated business operations, client-facing problem solving, process discipline, documentation, and technical systems training.",
+      ),
+    "The approved professional-background paragraph appears exactly once and supersedes the prior paragraph.",
+  );
   const educationSection =
     home.match(/<section\s+class="section section-tinted"\s+id="education"[\s\S]*?<\/section>/i)?.[0] ||
     "";
@@ -653,6 +670,31 @@ export function runPublicValidation({ writeReport = true } = {}) {
         educationSection,
       ),
     "The credential supports the broader technical story without inferred curriculum or cyber-specialist positioning.",
+  );
+  const conversationSection =
+    home.match(/<section\s+class="section conversation-section"\s+id="conversation"[\s\S]*?<\/section>/i)?.[0] ||
+    "";
+  check(
+    "CONVERSATION_COPY_AND_LINKS_EXACT",
+    count(home, /id="conversation"/g) === 1 &&
+      conversationSection.includes('<h2 id="conversation-title">' + exactConversationHeading + "</h2>") &&
+      conversationSection.includes("<p>" + exactConversationBody + "</p>") &&
+      conversationSection.includes(
+        '<a class="conversation-link" href="' + profileUrl + '">View GitHub</a>',
+      ) &&
+      conversationSection.includes(
+        '<a class="conversation-link" href="' + linkedInUrl + '">Connect on LinkedIn</a>',
+      ) &&
+      !/button-(?:primary|secondary)/i.test(conversationSection),
+    "The subdued CTA uses the exact approved heading, body, labels, and profile URLs.",
+  );
+  check(
+    "CONVERSATION_PLACEMENT",
+    home.indexOf(experienceSection) >= 0 &&
+      home.indexOf(educationSection) > home.indexOf(experienceSection) &&
+      home.indexOf(conversationSection) > home.indexOf(educationSection) &&
+      home.indexOf("</main>") > home.indexOf(conversationSection),
+    "The CTA follows substantive proof, professional background, tools, and education and remains inside main.",
   );
   check(
     "NOT_FOUND_USEFUL",

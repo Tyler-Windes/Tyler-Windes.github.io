@@ -19,7 +19,7 @@ npm run validate
 npm run dev
 ```
 
-`npm run build` copies the committed static source and assets byte-for-byte into `dist/`. `npm run validate` rebuilds the site and checks the source contract, exact source/build parity, route and fragment integrity, canonical and social metadata, robots and sitemap files, accessibility structure, responsive CSS, public URL allowlist, and privacy boundaries.
+`npm run build` copies the committed static source and assets byte-for-byte into `dist/`. `npm run validate` rebuilds the site and checks the source contract, exact source/build parity, route and fragment integrity, canonical and social metadata, robots and sitemap files, accessibility structure, responsive CSS, the approved homepage background and CTA copy and placement, the exact GitHub and LinkedIn URL allowlist, and privacy boundaries.
 
 ## Site address authority
 
