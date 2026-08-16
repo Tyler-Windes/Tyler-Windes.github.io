@@ -1,0 +1,35 @@
+{
+  "$schema": "../schemas/public-project-content.schema.json",
+  "schema_version": "2.0.0",
+  "project_id": "PORT-0003",
+  "title": "SaaS Integration Reliability & Support Troubleshooting",
+  "subtitle": "A local synthetic source-to-target integration that makes mapping, ordering, retry, dead-letter, replay, reconciliation, and support evidence reviewable.",
+  "data_class": "Synthetic",
+  "publication_state": "PortfolioApproved",
+  "differentiator": "This project adds executable integration-reliability and troubleshooting proof: two API contracts, a portable Python orchestrator, explicit failure behavior, linked replay, reconciliation, and operator-facing incident guidance.",
+  "problem": "Account and entitlement changes can become unreliable when deliveries repeat, arrive out of order, fail authentication, hit transient target errors, or drift from the source of truth without visible reconciliation and recovery evidence.",
+  "judgment": "The implementation keeps source authority, delivery state, and target state distinct; rejects unsupported input before target calls; bounds retry behavior; preserves dead-letter history; links replay; and reconciles the final target state to the latest valid source state.",
+  "evidence": [
+    "Twelve named local scenarios with exact expected outcomes",
+    "Bounded 429 recovery and 503 retry-exhaustion behavior",
+    "Linked dead-letter replay and final reconciliation of three matching records with zero exceptions",
+    "Ten-topic support runbook and three incident walkthroughs"
+  ],
+  "capabilities": [
+    "API contracts and data mapping",
+    "Idempotency and event ordering",
+    "Retry, dead letter, and replay",
+    "Reconciliation and structured traceability",
+    "Integration support and troubleshooting"
+  ],
+  "links": {
+    "case_study_path": "projects/saas-integration-reliability-support-troubleshooting.html",
+    "repository_name": "saas-integration-reliability-support-troubleshooting",
+    "repository_url": "https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting",
+    "repository_state": "ExistingPublicRepositoryWithVerifiedV1Release"
+  },
+  "scope": [
+    "All records, APIs, failures, traces, and incidents are synthetic and local. The project represents no real customer, client, production integration, live service, business result, or operational ownership.",
+    "The Python reference orchestrator is the executable authority. n8n runtime execution was deferred, and the included n8n workflow remains an unexecuted structural draft rather than evidence of n8n proficiency."
+  ]
+}

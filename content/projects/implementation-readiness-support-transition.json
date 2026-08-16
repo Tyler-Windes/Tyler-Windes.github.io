@@ -1,0 +1,34 @@
+{
+  "$schema": "../schemas/public-project-content.schema.json",
+  "schema_version": "2.0.0",
+  "project_id": "PORT-0002",
+  "title": "Implementation Readiness & Support Transition",
+  "subtitle": "A synthetic, platform-neutral work sample showing how requirements, readiness, UAT findings, transition controls, and support handoff fit together.",
+  "data_class": "Synthetic",
+  "publication_state": "PortfolioApproved",
+  "differentiator": "This project extends the portfolio beyond technical workflow proof by focusing on implementation readiness, retest judgment, rollback, role enablement, early-life support, and ownership handoff.",
+  "problem": "A fictional internal service-request process relies on email and a shared tracker. Minimum submission rules blur into later clarification, priority and routing vary, accountable ownership is unclear, and closure can lose context needed by support.",
+  "judgment": "The design separates the minimum submission gate from post-submission completeness, makes category and priority decisions explicit, requires one accountable owner, and blocks closure until requester validation and handoff context are retained.",
+  "evidence": [
+    "Eight final synthetic UAT outcomes after two corrected findings and passing retests",
+    "Six explicit transition smoke checks with a concrete rollback boundary",
+    "Three simulated hypercare days linked to support runbooks and ownership handoff"
+  ],
+  "capabilities": [
+    "Discovery and requirements",
+    "Configuration-readiness judgment",
+    "Synthetic UAT and retest decisions",
+    "Cutover, rollback, and communications",
+    "Role enablement and support handoff"
+  ],
+  "links": {
+    "case_study_path": "projects/implementation-readiness-support-transition.html",
+    "repository_name": "implementation-readiness-support-transition",
+    "repository_url": "https://github.com/Tyler-Windes/implementation-readiness-support-transition",
+    "repository_state": "ExistingPublicRepositoryWithVerifiedV1Release"
+  },
+  "scope": [
+    "This is a synthetic, fictional, platform-neutral work sample. It is not evidence of a real implementation, stakeholder engagement, configured platform, UAT, deployment, training, hypercare, or support ownership.",
+    "All readiness, transition, and support outcomes are modeled locally for review; no live platform, external account, or operational outcome is represented."
+  ]
+}

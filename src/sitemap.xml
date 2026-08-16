@@ -6,4 +6,10 @@
   <url>
     <loc>{{SITE_BASE_URL}}/projects/workflow-intake-analysis.html</loc>
   </url>
+  <url>
+    <loc>{{SITE_BASE_URL}}/projects/implementation-readiness-support-transition.html</loc>
+  </url>
+  <url>
+    <loc>{{SITE_BASE_URL}}/projects/saas-integration-reliability-support-troubleshooting.html</loc>
+  </url>
 </urlset>

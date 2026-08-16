@@ -1,70 +1,143 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:tyler-windes:portfolio:schemas:public-project-content:1.0.0",
+  "$id": "urn:tyler-windes:portfolio:schemas:public-project-content:2.0.0",
   "title": "Public project content",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "$schema",
-    "schema_version",
-    "title",
-    "subtitle",
-    "data_class",
-    "why_built",
-    "lead_problem",
-    "human_judgment",
-    "design_decisions",
-    "primary_skills",
-    "results",
-    "links",
-    "ai_use",
-    "scope",
-    "lesson",
-    "next_improvement"
+  "oneOf": [
+    { "$ref": "#/$defs/workflow_analysis_v1" },
+    { "$ref": "#/$defs/public_case_study_v2" }
   ],
-  "properties": {
-    "$schema": { "type": "string", "const": "../schemas/public-project-content.schema.json" },
-    "schema_version": { "type": "string", "const": "1.0.0" },
-    "title": { "type": "string", "const": "Workflow Intake Analysis Demo" },
-    "subtitle": { "type": "string", "minLength": 40 },
-    "data_class": { "type": "string", "const": "Synthetic" },
-    "why_built": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "minLength": 80 } },
-    "lead_problem": { "type": "string", "minLength": 100 },
-    "human_judgment": { "type": "string", "minLength": 120 },
-    "design_decisions": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "minLength": 70 } },
-    "primary_skills": { "type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": { "type": "string" } },
-    "results": {
-      "type": "array",
-      "minItems": 6,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["value", "label"],
-        "properties": { "value": { "type": "string" }, "label": { "type": "string" } }
+  "$defs": {
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "label"],
+      "properties": {
+        "value": { "type": "string" },
+        "label": { "type": "string" }
       }
     },
-    "links": {
+    "workflow_analysis_v1": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "repository_name",
-        "repository_url",
-        "profile_url"
+        "$schema",
+        "schema_version",
+        "project_id",
+        "title",
+        "subtitle",
+        "data_class",
+        "publication_state",
+        "why_built",
+        "lead_problem",
+        "human_judgment",
+        "design_decisions",
+        "primary_skills",
+        "results",
+        "links",
+        "ai_use",
+        "scope",
+        "lesson",
+        "next_improvement"
       ],
       "properties": {
-        "repository_name": { "type": "string", "const": "workflow-intake-analysis-demo" },
-        "repository_url": { "type": "string", "const": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo" },
-        "profile_url": { "type": "string", "const": "https://github.com/Tyler-Windes" }
+        "$schema": { "type": "string", "const": "../schemas/public-project-content.schema.json" },
+        "schema_version": { "type": "string", "const": "1.0.0" },
+        "title": { "type": "string", "const": "Workflow Intake Analysis Demo" },
+        "subtitle": { "type": "string", "minLength": 40 },
+        "data_class": { "type": "string", "const": "Synthetic" },
+        "why_built": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "minLength": 80 } },
+        "lead_problem": { "type": "string", "minLength": 100 },
+        "human_judgment": { "type": "string", "minLength": 120 },
+        "design_decisions": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "minLength": 70 } },
+        "primary_skills": { "type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": { "type": "string" } },
+        "results": { "type": "array", "minItems": 6, "items": { "$ref": "#/$defs/result" } },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["repository_name", "repository_url", "profile_url"],
+          "properties": {
+            "repository_name": { "type": "string", "const": "workflow-intake-analysis-demo" },
+            "repository_url": { "type": "string", "const": "https://github.com/Tyler-Windes/workflow-intake-analysis-demo" },
+            "profile_url": { "type": "string", "const": "https://github.com/Tyler-Windes" }
+          }
+        },
+        "ai_use": { "type": "string", "minLength": 180 },
+        "scope": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "minLength": 80 } },
+        "lesson": { "type": "string", "minLength": 80 },
+        "next_improvement": { "type": "string", "minLength": 100 }
       }
     },
-    "ai_use": { "type": "string", "minLength": 180 },
-    "scope": {
-      "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
-      "items": { "type": "string", "minLength": 80 }
-    },
-    "lesson": { "type": "string", "minLength": 80 },
-    "next_improvement": { "type": "string", "minLength": 100 }
+    "public_case_study_v2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "$schema",
+        "schema_version",
+        "title",
+        "subtitle",
+        "data_class",
+        "differentiator",
+        "problem",
+        "judgment",
+        "evidence",
+        "capabilities",
+        "links",
+        "scope"
+      ],
+      "properties": {
+        "$schema": { "type": "string", "const": "../schemas/public-project-content.schema.json" },
+        "schema_version": { "type": "string", "const": "2.0.0" },
+        "project_id": { "type": "string", "enum": ["PORT-0002", "PORT-0003"] },
+        "title": { "type": "string", "minLength": 24 },
+        "subtitle": { "type": "string", "minLength": 60 },
+        "data_class": { "type": "string", "const": "Synthetic" },
+        "publication_state": { "type": "string", "const": "PortfolioApproved" },
+        "differentiator": { "type": "string", "minLength": 80 },
+        "problem": { "type": "string", "minLength": 100 },
+        "judgment": { "type": "string", "minLength": 100 },
+        "evidence": { "type": "array", "minItems": 3, "maxItems": 6, "uniqueItems": true, "items": { "type": "string", "minLength": 24 } },
+        "capabilities": { "type": "array", "minItems": 4, "maxItems": 8, "uniqueItems": true, "items": { "type": "string" } },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["case_study_path", "repository_name", "repository_url", "repository_state"],
+          "properties": {
+            "case_study_path": { "type": "string", "pattern": "^projects/[a-z0-9-]+\\.html$" },
+            "repository_name": { "type": "string", "minLength": 20 },
+            "repository_url": { "type": "string", "pattern": "^https://github\\.com/Tyler-Windes/[a-z0-9-]+$" },
+            "repository_state": { "type": "string", "const": "ExistingPublicRepositoryWithVerifiedV1Release" }
+          }
+        },
+        "scope": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "string", "minLength": 70 } }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "project_id": { "const": "PORT-0002" },
+            "title": { "const": "Implementation Readiness & Support Transition" },
+            "links": {
+              "properties": {
+                "case_study_path": { "const": "projects/implementation-readiness-support-transition.html" },
+                "repository_name": { "const": "implementation-readiness-support-transition" },
+                "repository_url": { "const": "https://github.com/Tyler-Windes/implementation-readiness-support-transition" }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "project_id": { "const": "PORT-0003" },
+            "title": { "const": "SaaS Integration Reliability & Support Troubleshooting" },
+            "links": {
+              "properties": {
+                "case_study_path": { "const": "projects/saas-integration-reliability-support-troubleshooting.html" },
+                "repository_name": { "const": "saas-integration-reliability-support-troubleshooting" },
+                "repository_url": { "const": "https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting" }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

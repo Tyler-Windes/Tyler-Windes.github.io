@@ -1,17 +1,27 @@
-# Tyler Windes Portfolio
+# Tyler Windes Portfolio — Three-Project Publication Source
 
-Source for [tyler-windes.com](https://tyler-windes.com/), a static professional portfolio focused on systems analysis, workflow validation, SQL-backed evidence, and implementation-ready documentation. The GitHub Pages hosting repository remains `Tyler-Windes/Tyler-Windes.github.io`; that repository identity is distinct from the public website identity.
+Source for [tyler-windes.com](https://tyler-windes.com/), the public narrative layer for three distinct technical and implementation work samples. The GitHub Pages hosting repository remains `Tyler-Windes/Tyler-Windes.github.io`; that repository identity is distinct from the public website identity.
 
-The site currently includes:
+This static-site source brings three distinct work samples into one recruiter-facing portfolio:
 
-- a role-led portfolio home page;
-- a verified [Workflow Intake Analysis Demo](https://tyler-windes.com/projects/workflow-intake-analysis.html) case study;
-- accessible, responsive HTML and CSS with no client-side JavaScript;
-- no analytics, forms, cookies, trackers, runtime APIs, external assets, or direct contact collection.
+- **Workflow Intake Analysis Demo** — workflow analysis, data validation, Python, SQL, API contracts, testing, and traceability;
+- **Implementation Readiness & Support Transition** — requirements, readiness, synthetic UAT, retest judgment, rollback, enablement, and support handoff; and
+- **SaaS Integration Reliability & Support Troubleshooting** — local API contracts, mapping, idempotency, retry, dead letter, replay, reconciliation, and operator troubleshooting.
+
+All project data and scenarios are synthetic. The site does not claim client work, employer implementation, production operation, real UAT, real go-live, measured outcomes, or n8n proficiency.
+
+## Verified project repositories
+
+The published project pages link to the verified public repositories:
+
+- `https://github.com/Tyler-Windes/implementation-readiness-support-transition`
+- `https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting`
+
+`npm run validate` performs the complete public-source gate and fails closed if either repository URL is missing or if an unresolved publication token remains.
 
 ## Local use
 
-Node.js 24.18.1 is the reviewed runtime. The project has no package dependencies.
+Node.js 24.18.1 is the reviewed runtime. The site has no package dependencies, client-side JavaScript, analytics, forms, cookies, trackers, runtime APIs, or third-party assets.
 
 ```text
 npm run build
@@ -19,15 +29,19 @@ npm run validate
 npm run dev
 ```
 
-`npm run build` copies the committed static source and assets byte-for-byte into `dist/`. `npm run validate` rebuilds the site and checks the source contract, exact source/build parity, route and fragment integrity, canonical and social metadata, robots and sitemap files, accessibility structure, responsive CSS, the approved homepage background and CTA copy and placement, the exact GitHub and LinkedIn URL allowlist, and privacy boundaries.
+The build copies committed static source and assets to `dist`, resolves `{{SITE_BASE_URL}}` from `content/site/site-config.json`, generates `robots.txt` and `sitemap.xml`, and writes a deterministic manifest to `validation/build-manifest.json`.
+
+## Content contracts
+
+`content/schemas/public-project-content.schema.json` is the shared project-content contract. Version 2 preserves the existing Workflow Intake Analysis content shape and adds the published case-study shape used by the readiness and integration projects. Their project IDs and exact published-state vocabulary remain structured metadata and are not rendered in the employer-facing pages.
+
+Education remains controlled by `content/site/education.json` and `content/schemas/public-education-content.schema.json`. It distinguishes the completed University of Denver technical-training program from degrees and preserves Colorado State University and the University of Northern Colorado as coursework only.
 
 ## Site address authority
 
-`content/site/site-config.json` is the one committed authority for the public site base URL. The build derives canonical URLs, `og:url`, absolute `og:image` URLs, `robots.txt`, `sitemap.xml`, and public schema identifiers from `site_base_url`; validation reads the same authority and checks the generated result. The current value is `https://tyler-windes.com`.
+`content/site/site-config.json` is the committed authority for the employer-facing base URL. The build derives canonical URLs, `og:url`, absolute social-preview URLs, robots, and sitemap entries from `site_base_url`. The current value is `https://tyler-windes.com`.
 
-For the later separately authorized move to `https://tylerwindes.com`, change only `site_base_url`, then run the full validation, deployment, redirect, and signed-out readback gates. DNS, Cloudflare, and GitHub Pages domain settings remain separate infrastructure actions. No redirect for `tylerwindes.com` is configured here.
-
-The homepage education section is controlled by `content/site/education.json` and the closed `content/schemas/public-education-content.schema.json` contract. The contract records the University of Denver boot camp as completed technical training and preserves Colorado State University and University of Northern Colorado as coursework, not degrees.
+For any later separately authorized domain move, change only `site_base_url`, then run the full validation, deployment, redirect, and signed-out readback gates. DNS, Cloudflare, and GitHub Pages settings remain separate infrastructure actions.
 
 ## Deployment
 
@@ -45,7 +59,7 @@ Action pins reviewed on 2026-08-13:
 
 ## Scope
 
-The featured project uses synthetic data and is a professional-quality demonstration, not a production deployment or a claim of measured business outcomes. The repository publishes no résumé or direct contact route.
+This repository controls the static site source. Deployment, DNS, Cloudflare, profiles, Job Search, résumés, email, and messaging remain separately governed surfaces.
 
 ## License
 

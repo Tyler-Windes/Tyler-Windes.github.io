@@ -8,7 +8,6 @@
   <meta name="robots" content="index, follow">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#173f36">
-  <link rel="canonical" href="{{SITE_BASE_URL}}/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Tyler Windes Portfolio">
   <meta property="og:title" content="Tyler Windes | Technical Consultant &amp; Systems Analyst">
@@ -19,6 +18,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Tyler Windes — Technical Consultant and Systems Analyst">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{SITE_BASE_URL}}/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -51,7 +51,7 @@
           <h1 id="hero-title">I turn ambiguous workflows into <span>clear, testable systems.</span></h1>
           <p class="hero-lead">I connect business context to requirements, data rules, SQL-backed analysis, and practical documentation so the next decision is easier to understand and support.</p>
           <div class="hero-actions" aria-label="Portfolio actions">
-            <a class="button button-primary" href="projects/workflow-intake-analysis.html">Read the case study</a>
+            <a class="button button-primary" href="#work">Explore selected work</a>
             <a class="button button-secondary" href="#capabilities">Explore capabilities</a>
           </div>
         </div>
@@ -105,42 +105,38 @@
     <section class="section section-tinted" id="work" aria-labelledby="work-title">
       <div class="shell">
         <div class="section-heading split-heading">
-          <div>
-            <p class="eyebrow">Selected work</p>
-            <h2 id="work-title">Workflow Intake Analysis Demo</h2>
-          </div>
-          <p>A practical Python and SQL workflow for turning inconsistent synthetic intake into validated, traceable results.</p>
+          <div><p class="eyebrow">Selected work</p><h2 id="work-title">Three projects. Three different kinds of proof.</h2></div>
+          <p>Each case study uses synthetic data and a bounded local scope. Together they show how I move from workflow analysis, to implementation readiness, to integration reliability and support.</p>
         </div>
 
-        <article class="project-feature" aria-labelledby="workflow-card-title">
-          <div class="project-feature-main">
-            <p class="project-context">Featured case study · Synthetic data</p>
-            <h3 id="workflow-card-title">Preserve uncertainty instead of manufacturing certainty</h3>
-            <p class="project-summary">I built a workflow that defines the business rules, protects unknown values, separates records that are ready for use from those that need review, and traces each result back to its source.</p>
-            <ul class="tag-list" aria-label="Demonstrated project areas">
-              <li>Systems analysis</li>
-              <li>Requirements</li>
-              <li>Data validation</li>
-              <li>SQL</li>
-              <li>Traceability</li>
-              <li>Testing</li>
-            </ul>
-            <div class="project-links" aria-label="Project links">
-              <a class="text-link text-link-light" href="projects/workflow-intake-analysis.html">Read the case study <span aria-hidden="true">→</span></a>
-              <a class="text-link text-link-light" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo">View repository <span aria-hidden="true">↗</span></a>
-            </div>
-          </div>
-          <div class="project-feature-proof" aria-label="Project evidence snapshot">
-            <p class="proof-label">Evidence snapshot</p>
-            <dl class="proof-list">
-              <div><dt>Synthetic records</dt><dd>30</dd></div>
-              <div><dt>Validated</dt><dd>21</dd></div>
-              <div><dt>Needs review</dt><dd>9</dd></div>
-              <div><dt>Traceability rows</dt><dd>420</dd></div>
-            </dl>
-            <p class="project-proof-note">Every record stays visible; only records that meet the defined contract enter the validated result.</p>
-          </div>
-        </article>
+        <div class="project-portfolio-grid">
+          <article class="portfolio-project-card portfolio-project-featured" aria-labelledby="workflow-card-title">
+            <div class="portfolio-project-topline"><span>01 · Workflow and data</span><span>Synthetic data</span></div>
+            <h3 id="workflow-card-title">Workflow Intake Analysis Demo</h3>
+            <p>Turn inconsistent intake into validated and review-required outputs without hiding uncertainty.</p>
+            <p class="project-difference"><strong>Strongest proof:</strong> workflow analysis, data rules, Python/SQL processing, API contracts, testing, and traceability.</p>
+            <ul class="tag-list" aria-label="Workflow project capabilities"><li>Requirements</li><li>Data quality</li><li>Python</li><li>SQL</li><li>Traceability</li></ul>
+            <div class="portfolio-project-actions"><a class="text-link text-link-light" href="projects/workflow-intake-analysis.html">Read case study <span aria-hidden="true">→</span></a><a class="text-link text-link-light" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo">View repository <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="portfolio-project-card" aria-labelledby="readiness-card-title">
+            <div class="portfolio-project-topline"><span>02 · Implementation lifecycle</span><span>Synthetic lifecycle</span></div>
+            <h3 id="readiness-card-title">Implementation Readiness &amp; Support Transition</h3>
+            <p>Carry a fictional service-request workflow through requirements, readiness, UAT findings, retests, rollback, enablement, and support handoff.</p>
+            <p class="project-difference"><strong>Strongest proof:</strong> implementation-analysis judgment, transition controls, role readiness, hypercare, and handoff.</p>
+            <ul class="tag-list" aria-label="Readiness project capabilities"><li>Readiness</li><li>Synthetic UAT</li><li>Retests</li><li>Rollback</li><li>Handoff</li></ul>
+            <div class="portfolio-project-actions"><a class="text-link text-link-light" href="projects/implementation-readiness-support-transition.html">Read case study <span aria-hidden="true">→</span></a><a class="text-link text-link-light" href="https://github.com/Tyler-Windes/implementation-readiness-support-transition">View repository <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="portfolio-project-card" aria-labelledby="integration-card-title">
+            <div class="portfolio-project-topline"><span>03 · Integration reliability</span><span>Synthetic integration</span></div>
+            <h3 id="integration-card-title">SaaS Integration Reliability &amp; Support Troubleshooting</h3>
+            <p>Exercise source-to-target contracts, mapping, idempotency, ordering, retries, dead letter, replay, reconciliation, and incident response.</p>
+            <p class="project-difference"><strong>Strongest proof:</strong> executable integration reliability, structured evidence, recovery, and troubleshooting.</p>
+            <ul class="tag-list" aria-label="Integration project capabilities"><li>FastAPI</li><li>Mapping</li><li>Retries</li><li>Replay</li><li>Reconciliation</li></ul>
+            <div class="portfolio-project-actions"><a class="text-link text-link-light" href="projects/saas-integration-reliability-support-troubleshooting.html">Read case study <span aria-hidden="true">→</span></a><a class="text-link text-link-light" href="https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting">View repository <span aria-hidden="true">↗</span></a></div>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -189,8 +185,8 @@
       <div class="shell">
         <div class="section-heading">
           <p class="eyebrow">Tools and methods</p>
-          <h2 id="tools-title">Tools connected to working proof</h2>
-          <p>The case study connects analysis artifacts to a working Python pipeline, SQLite, SQL, schemas, a bounded API contract, and automated checks.</p>
+          <h2 id="tools-title">Tools connected to bounded, reviewable proof</h2>
+          <p>The projects connect analysis artifacts to local Python, SQLite, SQL, API contracts, structured tests, transition evidence, reconciliation, and support documentation.</p>
         </div>
         <ul class="tool-list" aria-label="Tools and methods demonstrated in the case study">
           <li>Python</li>
@@ -259,7 +255,7 @@
   <footer class="site-footer">
     <div class="shell footer-inner">
       <p>Tyler Windes</p>
-      <p><a href="https://github.com/Tyler-Windes">GitHub profile</a></p>
+      <p>Technical Consultant · Systems Analyst</p>
     </div>
   </footer>
 </body>

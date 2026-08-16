@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SaaS Integration Reliability &amp; Support Troubleshooting | Tyler Windes</title>
+  <meta name="description" content="A synthetic local integration case study covering API contracts, mapping, idempotency, retries, dead letter, replay, reconciliation, and troubleshooting.">
+  <meta name="robots" content="index, follow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#173f36">
+  <link rel="canonical" href="{{SITE_BASE_URL}}/projects/saas-integration-reliability-support-troubleshooting.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Tyler Windes Portfolio">
+  <meta property="og:title" content="SaaS Integration Reliability &amp; Support Troubleshooting">
+  <meta property="og:description" content="A synthetic local integration case study covering API contracts, mapping, idempotency, retries, dead letter, replay, reconciliation, and troubleshooting.">
+  <meta property="og:url" content="{{SITE_BASE_URL}}/projects/saas-integration-reliability-support-troubleshooting.html">
+  <meta property="og:image" content="{{SITE_BASE_URL}}/assets/social-preview-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tyler Windes — Technical Consultant and Systems Analyst">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="../index.html" aria-label="Tyler Windes portfolio home"><span class="brand-mark" aria-hidden="true">TW</span><span>Tyler Windes</span></a>
+      <nav aria-label="Project navigation"><ul class="nav-list"><li><a href="../index.html#work">Selected work</a></li><li><a href="workflow-intake-analysis.html">Workflow analysis</a></li><li><a href="implementation-readiness-support-transition.html">Implementation readiness</a></li></ul></nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="project-hero" aria-labelledby="project-title">
+      <div class="shell project-hero-inner">
+        <a class="breadcrumb" href="../index.html#work">← Back to selected work</a>
+        <p class="eyebrow">Synthetic local integration-reliability work sample</p>
+        <h1 id="project-title">SaaS Integration Reliability &amp; Support Troubleshooting</h1>
+        <p class="hero-lead">A source-to-target account and entitlement synchronization exercise that makes contracts, mapping, failure handling, recovery, reconciliation, and operator evidence visible.</p>
+        <dl class="project-facts">
+          <div><dt>Executable authority</dt><dd>Python reference orchestrator</dd></div>
+          <div><dt>Contracts</dt><dd>Source and target OpenAPI</dd></div>
+          <div><dt>Reliability</dt><dd>Retry, dead letter, replay</dd></div>
+          <div><dt>Boundary</dt><dd>Local synthetic integration</dd></div>
+        </dl>
+        <div class="project-link-card" aria-labelledby="integration-links-title"><div><p class="project-context">Project proof</p><h2 id="integration-links-title">Review the executable evidence behind the case study</h2></div><div class="project-link-list"><a class="button button-primary" href="https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting">View repository</a><a class="text-link" href="../index.html#work">Compare selected work <span aria-hidden="true">→</span></a></div></div>
+      </div>
+    </section>
+
+    <nav class="case-toc" aria-label="On this page"><div class="shell"><p class="toc-title">On this page</p><ol><li><a href="#problem">Problem</a></li><li><a href="#architecture">Architecture</a></li><li><a href="#reliability">Reliability</a></li><li><a href="#evidence">Evidence</a></li><li><a href="#reconciliation">Reconciliation</a></li><li><a href="#support">Support</a></li><li><a href="#scope">Scope</a></li></ol></div></nav>
+
+    <section class="section case-section" id="problem" aria-labelledby="problem-title"><div class="shell case-grid"><div class="section-heading sticky-heading"><p class="eyebrow">The problem</p><h2 id="problem-title">A successful API call is not the same as a reliable integration</h2></div><div class="case-copy"><p>Account and entitlement changes can repeat, arrive out of order, fail validation or authentication, hit transient target errors, or drift from the source of truth. Without explicit delivery state and reconciliation, a workflow can report success while the target is stale or inconsistent.</p><p>This project models those failure paths directly and leaves evidence that a technical reviewer or support analyst can follow.</p></div></div></section>
+
+    <section class="section section-tinted case-section" id="architecture" aria-labelledby="architecture-title">
+      <div class="shell"><div class="section-heading"><p class="eyebrow">Architecture and contracts</p><h2 id="architecture-title">Keep source truth, delivery state, and target state separate</h2><p>Each layer answers a different operational question and exposes a bounded local contract.</p></div>
+        <figure class="evidence-visual" aria-labelledby="architecture-caption"><figcaption id="architecture-caption"><strong>Local integration authority flow</strong><span>No external service or live endpoint</span></figcaption><ol class="workflow-flow compact-flow"><li><span class="flow-number">01</span><strong>Source API</strong><small>Valid account and entitlement events</small></li><li><span class="flow-number">02</span><strong>Reference orchestrator</strong><small>Validate, map, order, and retry</small></li><li><span class="flow-number">03</span><strong>Integration state</strong><small>Delivery, idempotency, and dead-letter history</small></li><li><span class="flow-number">04</span><strong>Target API</strong><small>One current entitlement record per account</small></li><li><span class="flow-number">05</span><strong>Structured trace</strong><small>Correlation and outcome evidence</small></li><li><span class="flow-number">06</span><strong>Reconciliation</strong><small>Latest source state compared with target</small></li></ol><details class="text-alternative"><summary>Text alternative</summary><p>Synthetic source events enter a Python reference orchestrator. The orchestrator validates and maps each event, checks idempotency and ordering in integration state, applies bounded target retries, and records the result in a structured trace. Reconciliation compares the latest valid source state with one target record per account.</p></details></figure>
+      </div>
+    </section>
+
+    <section class="section case-section" id="reliability" aria-labelledby="reliability-title"><div class="shell"><div class="section-heading"><p class="eyebrow">Reliability decisions</p><h2 id="reliability-title">Reject permanent faults early; contain transient faults visibly</h2></div><div class="implementation-grid"><article><h3>Idempotency</h3><p>A duplicate event is acknowledged without a target write, preserving a single target record and unchanged state.</p></article><article><h3>Ordering</h3><p>An event version older than the latest accepted version is ignored before the target is called.</p></article><article><h3>Bounded retry</h3><p>A transient 429 recovers on the second attempt. Repeated 503 responses stop after the third attempt rather than retrying indefinitely.</p></article><article><h3>Dead letter and replay</h3><p>Exhausted delivery evidence remains intact. Replay uses the same event identity, a new trace, and an explicit link to the failed delivery.</p></article></div></div></section>
+
+    <section class="section section-tinted case-section" id="evidence" aria-labelledby="evidence-title"><div class="shell"><div class="section-heading"><p class="eyebrow">Executed local evidence</p><h2 id="evidence-title">Twelve scenarios make the important edges reviewable</h2><p>The figures describe deterministic local synthetic tests, not customer or production outcomes.</p></div><div class="metric-grid"><article><strong>12/12</strong><span>Expected scenario outcomes</span></article><article><strong>48</strong><span>Structured trace records</span></article><article><strong>2</strong><span>Attempts for 429 recovery</span></article><article><strong>3</strong><span>Attempts before 503 dead letter</span></article><article><strong>1</strong><span>Linked replay resolution</span></article><article><strong>3</strong><span>Final matching target records</span></article></div><div class="evidence-copy"><p>The test set covers create, tier update, suspension, duplicate delivery, out-of-order delivery, missing data, invalid enum, 429 recovery, 503 exhaustion, authentication rejection, reconciliation mismatch, and dead-letter replay.</p><p>Correlation evidence connects the original failed delivery to its replay while preserving the original event identity and one final target record.</p></div></div></section>
+
+    <section class="section case-section" id="reconciliation" aria-labelledby="reconciliation-title"><div class="shell case-grid"><div class="section-heading sticky-heading"><p class="eyebrow">Reconciliation</p><h2 id="reconciliation-title">Recovery is complete only when the final state agrees</h2></div><div class="case-copy"><p>The final comparison evaluates the latest valid source state against the target by account and field. It detects missing, stale, mismatched, and unexpected target records rather than relying on delivery status alone.</p><blockquote class="judgment-call"><p>A test-only mismatch is corrected from the latest valid source state through an explicit repair route. The evidence does not invent a higher-version source event or recast the repair as normal delivery.</p></blockquote><p>The final result contains three matching records and zero remaining reconciliation exceptions.</p></div></div></section>
+
+    <section class="section section-tinted case-section" id="support" aria-labelledby="support-title"><div class="shell"><div class="section-heading"><p class="eyebrow">Support and troubleshooting</p><h2 id="support-title">Turn a failure trace into a bounded operator decision</h2></div><div class="skills-grid"><article><h3>Authentication rejection</h3><p>Distinguish a rejected delivery from an absent source record or transient target failure.</p></article><article><h3>503 exhaustion and replay</h3><p>Confirm bounded attempts, retained dead-letter history, fault clearance, replay lineage, and final target state.</p></article><article><h3>Reconciliation mismatch</h3><p>Identify the differing field, confirm latest source authority, apply a controlled test repair, and reconcile again.</p></article><article><h3>Ten-topic runbook</h3><p>Each topic records signal, diagnosis, evidence, action, escalation, recovery, and closure guidance.</p></article></div></div></section>
+
+    <section class="section limits-section case-section" id="scope" aria-labelledby="scope-title"><div class="shell bridge-grid"><div><p class="eyebrow eyebrow-light">Scope</p><h2 id="scope-title">Executable local proof with a clear technology boundary</h2></div><div class="bridge-copy"><p>All records, APIs, failures, traces, and incidents are synthetic and local. This project represents no real customer, client, production integration, live service, enterprise scale, adoption, ROI, SLA performance, or operational ownership.</p><p>The Python reference orchestrator is the executable authority. n8n execution was deferred; the included workflow is a structural draft only and does not establish n8n proficiency.</p></div></div></section>
+
+    <nav class="project-switcher shell" aria-label="Explore other projects"><a href="workflow-intake-analysis.html"><span>Published foundation</span><strong>Workflow Intake Analysis</strong></a><a href="implementation-readiness-support-transition.html"><span>Previous case study</span><strong>Implementation Readiness</strong></a></nav>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><p>Tyler Windes · SaaS Integration Reliability &amp; Support Troubleshooting</p><p><a href="../index.html">Return to portfolio</a></p></div></footer>
+</body>
+</html>

@@ -1,12 +1,14 @@
 {
-  "name": "tyler-windes-github-pages",
+  "name": "tyler-windes-portfolio-site",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Static professional portfolio for Tyler Windes.",
+  "description": "Static three-project professional portfolio for Tyler Windes.",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "validate": "npm run build && node scripts/validate-public.mjs",
+    "validate": "npm run validate:public",
+    "validate:public": "npm run build && node scripts/validate-public.mjs",
+    "validate:publication": "npm run build && node scripts/validate-publication-preflight.mjs",
     "dev": "node scripts/build.mjs && node scripts/serve.mjs --root dist --port 4173",
     "preview": "node scripts/serve.mjs --root dist --port 4173"
   },

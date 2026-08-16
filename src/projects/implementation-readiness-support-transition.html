@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Readiness &amp; Support Transition | Tyler Windes</title>
+  <meta name="description" content="A synthetic implementation-readiness case study covering requirements, UAT findings, retests, rollback, enablement, hypercare, and support handoff.">
+  <meta name="robots" content="index, follow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#173f36">
+  <link rel="canonical" href="{{SITE_BASE_URL}}/projects/implementation-readiness-support-transition.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Tyler Windes Portfolio">
+  <meta property="og:title" content="Implementation Readiness &amp; Support Transition">
+  <meta property="og:description" content="A synthetic implementation-readiness case study covering requirements, UAT findings, retests, rollback, enablement, hypercare, and support handoff.">
+  <meta property="og:url" content="{{SITE_BASE_URL}}/projects/implementation-readiness-support-transition.html">
+  <meta property="og:image" content="{{SITE_BASE_URL}}/assets/social-preview-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tyler Windes — Technical Consultant and Systems Analyst">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="../index.html" aria-label="Tyler Windes portfolio home"><span class="brand-mark" aria-hidden="true">TW</span><span>Tyler Windes</span></a>
+      <nav aria-label="Project navigation"><ul class="nav-list"><li><a href="../index.html#work">Selected work</a></li><li><a href="workflow-intake-analysis.html">Workflow analysis</a></li><li><a href="saas-integration-reliability-support-troubleshooting.html">Integration reliability</a></li></ul></nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="project-hero" aria-labelledby="project-title">
+      <div class="shell project-hero-inner">
+        <a class="breadcrumb" href="../index.html#work">← Back to selected work</a>
+        <p class="eyebrow">Synthetic implementation lifecycle work sample</p>
+        <h1 id="project-title">Implementation Readiness &amp; Support Transition</h1>
+        <p class="hero-lead">A platform-neutral model for moving a fictional internal service-request workflow from ambiguous intake through readiness, synthetic UAT, transition controls, early-life support, and ownership handoff.</p>
+        <dl class="project-facts">
+          <div><dt>Problem</dt><dd>Ambiguous intake and ownership</dd></div>
+          <div><dt>Judgment</dt><dd>Readiness before transition</dd></div>
+          <div><dt>Evidence</dt><dd>UAT, retests, and smoke checks</dd></div>
+          <div><dt>Boundary</dt><dd>Synthetic · No live platform</dd></div>
+        </dl>
+        <div class="project-link-card" aria-labelledby="readiness-links-title"><div><p class="project-context">Project proof</p><h2 id="readiness-links-title">Review the readiness evidence behind the case study</h2></div><div class="project-link-list"><a class="button button-primary" href="https://github.com/Tyler-Windes/implementation-readiness-support-transition">View repository</a><a class="text-link" href="../index.html#work">Compare selected work <span aria-hidden="true">→</span></a></div></div>
+      </div>
+    </section>
+
+    <nav class="case-toc" aria-label="On this page"><div class="shell"><p class="toc-title">On this page</p><ol><li><a href="#problem">Problem</a></li><li><a href="#decisions">Decisions</a></li><li><a href="#walkthrough">Walkthrough</a></li><li><a href="#evidence">UAT evidence</a></li><li><a href="#transition">Transition</a></li><li><a href="#handoff">Support handoff</a></li><li><a href="#scope">Scope</a></li></ol></div></nav>
+
+    <section class="section case-section" id="problem" aria-labelledby="problem-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading"><p class="eyebrow">The problem</p><h2 id="problem-title">A request process can look simple while hiding implementation risk</h2></div>
+        <div class="case-copy"><p>The fictional current state begins in email and a shared tracker. Minimum submission content blurs into later clarification, priority and routing depend on individual judgment, accountable ownership is inconsistent, and closure can lose the context support would need.</p><p>The work sample turns those ambiguities into explicit, reviewable decisions without claiming that a platform was configured or a live process changed.</p></div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="decisions" aria-labelledby="decisions-title">
+      <div class="shell">
+        <div class="section-heading"><p class="eyebrow">Design decisions</p><h2 id="decisions-title">Separate the gates, make ownership visible, and protect closure</h2><p>Four decisions shape the readiness, test, transition, and support evidence.</p></div>
+        <div class="implementation-grid">
+          <article><h3>Two-stage intake</h3><p>Five minimum fields control submission. Conditional routing detail is reviewed only after submission, so a failed minimum gate never masquerades as clarification.</p></article>
+          <article><h3>Deterministic priority and routing</h3><p>Four categories map to modeled skill contexts. Priority is evaluated from Critical through Low, and the first satisfied rule controls.</p></article>
+          <article><h3>One accountable owner</h3><p>The coordinator retains responsibility until a match exists; assignment and reassignment always leave exactly one accountable Fulfiller.</p></article>
+          <article><h3>Requester-controlled closure</h3><p>Closure requires a requester decision plus resolution, ownership, category, support reference, and handoff context.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="walkthrough" aria-labelledby="walkthrough-title">
+      <div class="shell">
+        <div class="section-heading"><p class="eyebrow">Representative request</p><h2 id="walkthrough-title">Follow one request from intake to support context</h2><p>A fictional reporting request makes the decision rules concrete without introducing PII or a live platform.</p></div>
+        <figure class="evidence-visual" aria-labelledby="request-flow-caption">
+          <figcaption id="request-flow-caption"><strong>Department exception-view request</strong><span>Modeled lifecycle, not a live transaction</span></figcaption>
+          <ol class="workflow-flow compact-flow">
+            <li><span class="flow-number">01</span><strong>Submit</strong><small>Five minimum fields are present.</small></li>
+            <li><span class="flow-number">02</span><strong>Clarify</strong><small>Reporting period and filter definition are added.</small></li>
+            <li><span class="flow-number">03</span><strong>Prioritize</strong><small>Workaround plus near-term need produces Medium.</small></li>
+            <li><span class="flow-number">04</span><strong>Assign</strong><small>Data/Reporting route, one accountable Fulfiller.</small></li>
+            <li><span class="flow-number">05</span><strong>Resolve</strong><small>A definition blocker is recorded and cleared.</small></li>
+            <li><span class="flow-number">06</span><strong>Validate and close</strong><small>Requester accepts; support context is retained.</small></li>
+          </ol>
+          <details class="text-alternative"><summary>Text alternative</summary><p>A fictional Requester submits all five minimum fields for a department-level exception view. The coordinator requests missing reporting-period and filter details, recalculates completeness, applies Medium priority, and routes to the Data/Reporting skill context. One Fulfiller becomes accountable. A documented field-definition blocker is resolved before requester validation and closure with a support reference and handoff note.</p></details>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="shell">
+        <div class="section-heading"><p class="eyebrow">Test findings</p><h2 id="evidence-title">Findings matter when they change the readiness judgment</h2><p>Eight synthetic UAT cases exercise intake, routing, ownership, transition controls, communication, validation, and handoff.</p></div>
+        <div class="metric-grid"><article><strong>6</strong><span>Initial synthetic passes</span></article><article><strong>2</strong><span>Bounded findings corrected</span></article><article><strong>2</strong><span>Passing retests</span></article><article><strong>8/8</strong><span>Final synthetic passes</span></article><article><strong>6</strong><span>Transition smoke checks</span></article><article><strong>0</strong><span>Unresolved Critical or High items</span></article></div>
+        <div class="evidence-copy"><p>One finding exposed stale post-clarification completeness. The other exposed direct closure without a requester decision. The modeled guidance and rules were corrected, both retests passed, and the final readiness state changed accordingly.</p><p>These are static, synthetic observations. They do not claim software execution, real users, real UAT, or a configured platform.</p></div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="transition" aria-labelledby="transition-title">
+      <div class="shell case-grid"><div class="section-heading sticky-heading"><p class="eyebrow">Readiness and rollback</p><h2 id="transition-title">A GO decision follows the evidence; it does not create it</h2></div><div class="case-copy"><p>Passing retests, no unresolved Critical or High item, a frozen baseline, and ready role/runbook guidance precede the simulated go/no-go review. Its resulting GO decision then governs the modeled transition and six smoke checks.</p><blockquote class="judgment-call"><p>If a required check fails, the model pauses transition, restores the frozen baseline, preserves evidence, records rollback communication, and requires revalidation before resuming.</p></blockquote><p>All six modeled smoke checks pass, so rollback remains available but is not invoked.</p></div></div>
+    </section>
+
+    <section class="section section-tinted case-section" id="handoff" aria-labelledby="handoff-title">
+      <div class="shell"><div class="section-heading"><p class="eyebrow">Enablement and support</p><h2 id="handoff-title">Transition is incomplete until roles and support can use the result</h2></div><div class="skills-grid"><article><h3>Role guidance</h3><p>Requester, coordinator, fulfiller, and support responsibilities focus on changed decisions and retained context.</p></article><article><h3>Three-day hypercare model</h3><p>Early-life questions are triaged across three simulated business days without claiming a live support operation.</p></article><article><h3>Runbook mapping</h3><p>Each simulated case maps to a recovery path for completeness, closure validation, or handoff context.</p></article><article><h3>Ownership handoff</h3><p>The final review confirms closed cases, usable mappings, retained context, and no unresolved Critical or High item.</p></article></div></div>
+    </section>
+
+    <section class="section limits-section case-section" id="scope" aria-labelledby="scope-title"><div class="shell bridge-grid"><div><p class="eyebrow eyebrow-light">Scope</p><h2 id="scope-title">Synthetic implementation-analysis proof, not implementation experience</h2></div><div class="bridge-copy"><p>This project demonstrates requirements, readiness, test design, retest judgment, rollback logic, enablement, and support-transition thinking. It does not prove real stakeholder participation, configuration, platform administration, UAT, deployment, go-live, training, hypercare, SLA performance, adoption, savings, or other business outcomes.</p><p>It adds lifecycle and transition proof beyond the portfolio’s separate workflow/data foundation and integration-reliability project.</p></div></div></section>
+
+    <nav class="project-switcher shell" aria-label="Explore other projects"><a href="workflow-intake-analysis.html"><span>Published foundation</span><strong>Workflow Intake Analysis</strong></a><a href="saas-integration-reliability-support-troubleshooting.html"><span>Next case study</span><strong>Integration Reliability</strong></a></nav>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><p>Tyler Windes · Implementation Readiness &amp; Support Transition</p><p><a href="../index.html">Return to portfolio</a></p></div></footer>
+</body>
+</html>

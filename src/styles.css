@@ -426,6 +426,71 @@ dd {
   border-radius: var(--radius-lg);
 }
 
+.project-portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.portfolio-project-card {
+  display: grid;
+  min-width: 0;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  align-content: start;
+  color: #eef7f3;
+  background: var(--accent-deep);
+  border: 1px solid var(--accent-deep);
+  border-radius: var(--radius-lg);
+}
+
+.portfolio-project-featured {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #173f36, #205c4f);
+}
+
+.portfolio-project-topline {
+  display: flex;
+  margin-bottom: 2rem;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #b9d6cb;
+  font-size: 0.75rem;
+  font-weight: 760;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.portfolio-project-card h3 {
+  max-width: 24ch;
+  margin-bottom: 1rem;
+  color: #fff;
+  font-size: var(--step-2);
+}
+
+.portfolio-project-card > p {
+  color: #d4e8e0;
+}
+
+.portfolio-project-card .project-difference {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: var(--step--1);
+}
+
+.portfolio-project-card .project-difference strong {
+  color: #fff;
+}
+
+.portfolio-project-actions {
+  display: flex;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.17);
+}
+
 .project-feature-main,
 .project-feature-proof {
   padding: clamp(1.75rem, 4vw, 3.5rem);
@@ -940,6 +1005,47 @@ dd {
   list-style: none;
 }
 
+.compact-flow li {
+  min-height: 8rem;
+}
+
+.project-switcher {
+  display: grid;
+  padding-block: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.project-switcher a {
+  display: grid;
+  min-height: 7.5rem;
+  padding: 1.25rem;
+  align-content: center;
+  gap: 0.35rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.project-switcher a:hover {
+  background: var(--accent-soft);
+  border-color: #bcd4ca;
+}
+
+.project-switcher span {
+  color: var(--signal);
+  font-size: 0.75rem;
+  font-weight: 760;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.project-switcher strong {
+  font-size: var(--step-1);
+}
+
 .workflow-flow li {
   display: grid;
   min-height: 9.5rem;
@@ -1085,8 +1191,13 @@ dd {
   .bridge-grid,
   .conversation-panel,
   .project-feature,
-  .lesson-grid {
+  .lesson-grid,
+  .project-portfolio-grid {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-project-featured {
+    grid-column: auto;
   }
 
   .conversation-actions {
@@ -1153,8 +1264,14 @@ dd {
   .decision-grid,
   .implementation-grid,
   .skills-grid,
-  .evidence-copy {
+  .evidence-copy,
+  .project-switcher {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-project-topline {
+    display: grid;
+    gap: 0.25rem;
   }
 
   .tool-list,
