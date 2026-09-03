@@ -20,6 +20,7 @@ const distRoot = join(projectRoot, "dist");
 const validationRoot = join(projectRoot, "validation");
 const htmlRoutes = [
   "index.html",
+  "irw/index.html",
   "projects/workflow-intake-analysis.html",
   "projects/implementation-readiness-support-transition.html",
   "projects/saas-integration-reliability-support-troubleshooting.html",
@@ -27,8 +28,8 @@ const htmlRoutes = [
 ];
 const sitemapRoutes = [
   "/",
+  "/irw/",
   "/projects/workflow-intake-analysis.html",
-  "/projects/implementation-readiness-support-transition.html",
   "/projects/saas-integration-reliability-support-troubleshooting.html",
 ];
 
