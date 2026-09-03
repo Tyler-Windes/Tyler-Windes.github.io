@@ -1,23 +1,30 @@
-# Tyler Windes Portfolio — Three-Project Publication Source
+# Tyler Windes Portfolio - Three Project Site
 
-Source for [tyler-windes.com](https://tyler-windes.com/), the public narrative layer for three distinct technical and implementation work samples. The GitHub Pages hosting repository remains `Tyler-Windes/Tyler-Windes.github.io`; that repository identity is distinct from the public website identity.
+Source for [tyler-windes.com](https://tyler-windes.com/), a static site that brings three related work samples into one consistent project path.
 
-This static-site source brings three distinct work samples into one recruiter-facing portfolio:
+The site presents:
 
-- **Workflow Intake Analysis Demo** — workflow analysis, data validation, Python, SQL, API contracts, testing, and traceability;
-- **Implementation Readiness & Support Transition** — requirements, readiness, synthetic UAT, retest judgment, rollback, enablement, and support handoff; and
-- **SaaS Integration Reliability & Support Troubleshooting** — local API contracts, mapping, idempotency, retry, dead letter, replay, reconciliation, and operator troubleshooting.
+- **Workflow Intake Analysis Demo** - workflow analysis, data validation, Python, SQL, API contracts, testing, and traceability
+- **Implementation Readiness and Support Transition** - a platform-neutral foundation connected to the IRW Jira and Confluence implementation, including requirements, UAT, Bug correction, readiness, rollback, and handoff
+- **SaaS Integration Reliability and Support Troubleshooting** - local API contracts, mapping, idempotency, retry, dead letter, replay, reconciliation, and troubleshooting
 
-All project data and scenarios are synthetic. The site does not claim client work, employer implementation, production operation, real UAT, real go-live, measured outcomes, or n8n proficiency.
+All project data and scenarios are fictional. The site does not claim customer work, production deployment, measured outcomes, or tools that were not actually implemented and tested.
 
-## Verified project repositories
+## Canonical project routes
 
-The published project pages link to the verified public repositories:
+- `https://tyler-windes.com/projects/workflow-intake-analysis.html`
+- `https://tyler-windes.com/irw/`
+- `https://tyler-windes.com/projects/saas-integration-reliability-support-troubleshooting.html`
 
+The previous implementation-readiness route remains as a redirect to `/irw/` so existing links continue to work.
+
+## Project repositories
+
+- `https://github.com/Tyler-Windes/workflow-intake-analysis-demo`
 - `https://github.com/Tyler-Windes/implementation-readiness-support-transition`
 - `https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting`
 
-`npm run validate` performs the complete public-source gate and fails closed if either repository URL is missing or if an unresolved publication token remains.
+The implementation-readiness repository contains the platform-neutral foundation. The live IRW Jira and Confluence workspace is the Atlassian implementation layer of the same project area. The foundation uses eight synthetic validation cases; IRW uses a separate ten-requirement and ten-test model.
 
 ## Local use
 
@@ -31,35 +38,43 @@ npm run dev
 
 The build copies committed static source and assets to `dist`, resolves `{{SITE_BASE_URL}}` from `content/site/site-config.json`, generates `robots.txt` and `sitemap.xml`, and writes a deterministic manifest to `validation/build-manifest.json`.
 
-## Content contracts
+## Content and validation
 
-`content/schemas/public-project-content.schema.json` is the shared project-content contract. Version 2 preserves the existing Workflow Intake Analysis content shape and adds the published case-study shape used by the readiness and integration projects. Their project IDs and exact published-state vocabulary remain structured metadata and are not rendered in the employer-facing pages.
+`content/schemas/public-project-content.schema.json` is the shared project-content contract. The validation scripts check:
 
-Education remains controlled by `content/site/education.json` and `content/schemas/public-education-content.schema.json`. It distinguishes the completed University of Denver technical-training program from degrees and preserves Colorado State University and the University of Northern Colorado as coursework only.
+- The exact public input and build file sets
+- Canonical URLs and social metadata
+- Internal and approved external links
+- The three-project homepage structure
+- The two-layer implementation-readiness narrative
+- The canonical `/irw/` route and legacy redirect
+- Fictional and non-production scope boundaries
+- Accessible page structure
+- Deterministic build parity and file hashes
+- Absence of local paths, unresolved tokens, and review-stage residue
 
-## Site address authority
+## Site address
 
-`content/site/site-config.json` is the committed authority for the employer-facing base URL. The build derives canonical URLs, `og:url`, absolute social-preview URLs, robots, and sitemap entries from `site_base_url`. The current value is `https://tyler-windes.com`.
+`content/site/site-config.json` controls the public base URL. The current value is `https://tyler-windes.com`.
 
-For any later separately authorized domain move, change only `site_base_url`, then run the full validation, deployment, redirect, and signed-out readback gates. DNS, Cloudflare, and GitHub Pages settings remain separate infrastructure actions.
+For a later domain move, change only `site_base_url`, then run the full validation, deployment, redirect, and signed-out review process. DNS, Cloudflare, and GitHub Pages settings remain separate infrastructure actions.
 
 ## Deployment
 
-GitHub Pages deploys only from validated pushes to `main`. Pull requests run the same public validation without deploying. The workflow uses least-privilege job permissions, the `github-pages` environment, deployment concurrency, and immutable action commit pins.
+GitHub Pages deploys only from validated pushes to `main`. Pull requests run the same public validation without deploying. The workflow uses least-privilege permissions, the `github-pages` environment, deployment concurrency, and immutable action commit pins.
 
-Action pins reviewed on 2026-08-13:
+## Current roadmap
 
-| Action | Reviewed release | Commit SHA |
-| --- | --- | --- |
-| `actions/checkout` | `v7.0.1` | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
-| `actions/setup-node` | `v7.0.0` | `820762786026740c76f36085b0efc47a31fe5020` |
-| `actions/configure-pages` | `v6.0.0` | `45bfe0192ca1faeb007ade9deae92b16b8254a0d` |
-| `actions/upload-pages-artifact` | `v5.0.0` | `fc324d3547104276b827a68afc52ff2a11cc49c9` |
-| `actions/deploy-pages` | `v5.0.0` | `cd2ce8fcbc39b97be8ca5fce6e763baed58fa128` |
+The IRW core v1.0 work is complete. The next phase contains:
+
+- Jira saved filters and a small status dashboard
+- A read-only Forge readiness component
+
+The Forge design is complete, and the certification path and hands-on preparation are in progress. No Forge source, app identity, build, deployment, installation, or runtime result is claimed yet.
 
 ## Scope
 
-This repository controls the static site source. Deployment, DNS, Cloudflare, profiles, Job Search, résumés, email, and messaging remain separately governed surfaces.
+This repository controls the static site source. Jira and Confluence configuration, DNS, Cloudflare, LinkedIn, resumes, email, and other career materials remain separately managed.
 
 ## License
 
