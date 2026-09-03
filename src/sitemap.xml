@@ -4,10 +4,10 @@
     <loc>{{SITE_BASE_URL}}/</loc>
   </url>
   <url>
-    <loc>{{SITE_BASE_URL}}/projects/workflow-intake-analysis.html</loc>
+    <loc>{{SITE_BASE_URL}}/irw/</loc>
   </url>
   <url>
-    <loc>{{SITE_BASE_URL}}/projects/implementation-readiness-support-transition.html</loc>
+    <loc>{{SITE_BASE_URL}}/projects/workflow-intake-analysis.html</loc>
   </url>
   <url>
     <loc>{{SITE_BASE_URL}}/projects/saas-integration-reliability-support-troubleshooting.html</loc>
