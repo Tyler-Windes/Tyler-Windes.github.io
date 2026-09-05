@@ -3,32 +3,32 @@
   "schema_version": "2.0.0",
   "project_id": "PORT-0002",
   "title": "Implementation Readiness & Support Transition",
-  "subtitle": "A synthetic, platform-neutral work sample showing how requirements, readiness, UAT findings, transition controls, and support handoff fit together.",
+  "subtitle": "A two-layer case study connecting a platform-neutral readiness model with a working Jira and Confluence implementation.",
   "data_class": "Synthetic",
   "publication_state": "PortfolioApproved",
-  "differentiator": "This project extends the portfolio beyond technical workflow proof by focusing on implementation readiness, retest judgment, rollback, role enablement, early-life support, and ownership handoff.",
-  "problem": "A fictional internal service-request process relies on email and a shared tracker. Minimum submission rules blur into later clarification, priority and routing vary, accountable ownership is unclear, and closure can lose context needed by support.",
-  "judgment": "The design separates the minimum submission gate from post-submission completeness, makes category and priority decisions explicit, requires one accountable owner, and blocks closure until requester validation and handoff context are retained.",
+  "differentiator": "This project connects platform-neutral lifecycle analysis with a working Atlassian implementation while keeping the two validation models and the v1.1 roadmap distinct.",
+  "problem": "A fictional service-request process begins with incomplete intake, unclear ownership, hidden dependencies, weak acceptance criteria, and support context that can be lost before handoff.",
+  "judgment": "The design separates minimum intake from later clarification, makes priority and ownership visible, records real blocking conditions, keeps validation separate from completion, and preserves failed tests through correction and retest.",
   "evidence": [
-    "Eight final synthetic UAT outcomes after two corrected findings and passing retests",
-    "Six explicit transition smoke checks with a concrete rollback boundary",
-    "Three simulated hypercare days linked to support runbooks and ownership handoff"
+    "Eight final synthetic foundation outcomes after two corrected findings and passing retests",
+    "A Jira and Confluence implementation with ten completed requirements, ten final passing UAT cases, and two closed Bugs",
+    "Core v1.0 separated from planned Jira reporting and Forge work in the v1.1 roadmap"
   ],
   "capabilities": [
-    "Discovery and requirements",
-    "Configuration-readiness judgment",
-    "Synthetic UAT and retest decisions",
-    "Cutover, rollback, and communications",
-    "Role enablement and support handoff"
+    "Requirements and acceptance criteria",
+    "Jira workflow and dependency design",
+    "UAT, Bug correction, and retesting",
+    "Readiness, rollback, and support handoff",
+    "Atlassian Forge solution design"
   ],
   "links": {
-    "case_study_path": "projects/implementation-readiness-support-transition.html",
+    "case_study_path": "irw/index.html",
     "repository_name": "implementation-readiness-support-transition",
     "repository_url": "https://github.com/Tyler-Windes/implementation-readiness-support-transition",
     "repository_state": "ExistingPublicRepositoryWithVerifiedV1Release"
   },
   "scope": [
-    "This is a synthetic, fictional, platform-neutral work sample. It is not evidence of a real implementation, stakeholder engagement, configured platform, UAT, deployment, training, hypercare, or support ownership.",
-    "All readiness, transition, and support outcomes are modeled locally for review; no live platform, external account, or operational outcome is represented."
+    "This project uses fictional information. The platform-neutral foundation and IRW workspace do not represent a customer deployment or measured business outcome.",
+    "The Jira dashboard and Forge application remain planned v1.1 work and are not described as complete."
   ]
 }

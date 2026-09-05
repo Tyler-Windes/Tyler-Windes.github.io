@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Readiness Workspace | Tyler Windes</title>
+  <meta name="description" content="A two-layer implementation-readiness case study connecting a platform-neutral lifecycle model with a working Jira and Confluence implementation.">
+  <meta name="robots" content="index, follow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#173f36">
+  <link rel="canonical" href="{{SITE_BASE_URL}}/irw/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Tyler Windes Portfolio">
+  <meta property="og:title" content="Implementation Readiness Workspace">
+  <meta property="og:description" content="Requirements, Jira workflow design, UAT, Bug correction, readiness, rollback, and support handoff in one fictional implementation case study.">
+  <meta property="og:url" content="{{SITE_BASE_URL}}/irw/">
+  <meta property="og:image" content="{{SITE_BASE_URL}}/assets/social-preview-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tyler Windes - Implementation Readiness Workspace">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="../index.html" aria-label="Tyler Windes portfolio home">
+        <span class="brand-mark" aria-hidden="true">TW</span>
+        <span>Tyler Windes</span>
+      </a>
+      <nav aria-label="Project navigation">
+        <ul class="nav-list">
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#solution">Solution</a></li>
+          <li><a href="#testing">Testing</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#roadmap">Roadmap</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <section class="project-hero" aria-labelledby="project-title">
+      <div class="shell project-hero-inner">
+        <a class="breadcrumb" href="../index.html#work">Back to selected work</a>
+        <p class="eyebrow">Requirements - Jira - Confluence - UAT - Support</p>
+        <h1 id="project-title">Implementation Readiness Workspace</h1>
+        <p class="hero-lead">A two-layer case study showing how I move an unclear service request through requirements, implementation, validation, readiness, and operational handoff.</p>
+        <dl class="project-facts" aria-label="Project facts">
+          <div><dt>Foundation</dt><dd>Platform-neutral lifecycle model</dd></div>
+          <div><dt>Implementation</dt><dd>Jira and Confluence workspace</dd></div>
+          <div><dt>Validation</dt><dd>10 final passing UAT cases</dd></div>
+          <div><dt>Next</dt><dd>Jira reporting and Forge</dd></div>
+        </dl>
+        <div class="project-link-card" aria-labelledby="project-links-title">
+          <div>
+            <p class="project-context">Project records</p>
+            <h2 id="project-links-title">Review the working materials</h2>
+          </div>
+          <div class="project-link-list">
+            <a class="button button-primary" href="https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169">Open the Atlassian case study</a>
+            <a class="text-link" href="https://github.com/Tyler-Windes/implementation-readiness-support-transition">View the foundation repository</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="case-toc" aria-label="On this page">
+      <div class="shell">
+        <p class="toc-title">On this page</p>
+        <ol>
+          <li><a href="#relationship">Two related layers</a></li>
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#role">My role</a></li>
+          <li><a href="#solution">Solution</a></li>
+          <li><a href="#testing">Testing and correction</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#decisions">Decisions</a></li>
+          <li><a href="#roadmap">v1.1 roadmap</a></li>
+        </ol>
+      </div>
+    </nav>
+
+    <section class="section case-section" id="relationship" aria-labelledby="relationship-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">Project relationship</p>
+          <h2 id="relationship-title">One problem area, developed in two layers</h2>
+        </div>
+        <div class="case-copy">
+          <p>I first developed a platform-neutral implementation-readiness model. It defines intake, routing, readiness, transition, rollback, early-life support, and ownership handoff without tying the work to one product.</p>
+          <p>I then applied the same capability area in a working Jira and Confluence workspace. IRW uses a separate ten-requirement and ten-test model to validate the Atlassian implementation.</p>
+          <blockquote class="judgment-call"><p>The original eight validation cases test the platform-neutral model. The ten IRW cases test the Jira and Confluence implementation. I keep the two sets separate because they answer different questions.</p></blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="problem" aria-labelledby="problem-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">The problem</p>
+          <h2 id="problem-title">Implementation risk often starts before implementation</h2>
+        </div>
+        <div class="case-copy">
+          <p>A request can look actionable while still missing the information needed for a sound decision. Ownership may be unclear, priority may have no documented reason, dependencies may live only in conversation, and acceptance criteria may be too vague to test.</p>
+          <p>IRW provides a practical way to make those conditions visible and keep the work connected from intake through closeout.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="role" aria-labelledby="role-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">My role</p>
+          <h2 id="role-title">I owned the analysis, decisions, validation, and closeout</h2>
+          <p>The project was completed as an individual fictional implementation. I used automation for repetitive setup and consistency checking, while retaining responsibility for the decisions and results.</p>
+        </div>
+        <div class="skills-grid">
+          <article><h3>Define</h3><p>Set the scope, assumptions, requirements, priorities, ownership, and acceptance criteria.</p></article>
+          <article><h3>Structure</h3><p>Organize Epics, Stories, Tasks, Subtasks, workflow states, and dependencies in Jira.</p></article>
+          <article><h3>Validate</h3><p>Run the UAT cases, evaluate the actual results, create Bugs after failures, and repeat the tests after correction.</p></article>
+          <article><h3>Reconcile</h3><p>Resolve conflicts between Jira and Confluence, make the readiness decision, and separate completed work from the next roadmap.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="solution" aria-labelledby="solution-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Solution</p>
+          <h2 id="solution-title">A traceable path from intake to handoff</h2>
+          <p>Ten requirements define what the workspace must support, and one fictional request shows how the pieces work together.</p>
+        </div>
+        <figure class="evidence-visual" aria-labelledby="workflow-caption">
+          <figcaption id="workflow-caption"><strong>IRW lifecycle</strong><span>Implementation and acceptance remain distinct</span></figcaption>
+          <ol class="workflow-flow compact-flow">
+            <li><span class="flow-number">01</span><strong>Intake</strong><small>Required information and missing-input checks</small></li>
+            <li><span class="flow-number">02</span><strong>Triage</strong><small>Owner, priority, impact, and urgency</small></li>
+            <li><span class="flow-number">03</span><strong>Implement</strong><small>Jira work, workflow states, and dependencies</small></li>
+            <li><span class="flow-number">04</span><strong>Validate</strong><small>Acceptance criteria and UAT</small></li>
+            <li><span class="flow-number">05</span><strong>Correct</strong><small>Bug, correction, and retest when needed</small></li>
+            <li><span class="flow-number">06</span><strong>Hand off</strong><small>Readiness, rollback, support, and traceability</small></li>
+          </ol>
+        </figure>
+        <div class="implementation-grid">
+          <article><h3>Requirements</h3><p>Ten stable requirements cover intake, ownership, workflow, dependencies, validation, defects, readiness, rollback, support, and traceability.</p></article>
+          <article><h3>Workflow</h3><p>To Do, Ready, In Progress, Blocked, Validation, and Done keep planned, active, prevented, validating, and completed work distinct.</p></article>
+          <article><h3>Dependency</h3><p>IRW-76, the intake prerequisite, blocks IRW-75, the triage and ownership work. The link remains visible after completion.</p></article>
+          <article><h3>Handoff</h3><p>The final records include readiness rules, rollback and smoke checks, risks, troubleshooting guidance, and ownership.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="testing" aria-labelledby="testing-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Testing and correction</p>
+          <h2 id="testing-title">The useful part was not that every test passed the first time</h2>
+          <p>Two tests exposed issues. I kept the failed results, corrected the records, and repeated the tests instead of rewriting the history.</p>
+        </div>
+        <div class="decision-grid">
+          <article class="decision-card">
+            <p class="decision-number">UAT-004</p>
+            <h3>Dependency interpretation</h3>
+            <p>A later test record used a stale interpretation of the intake-to-triage dependency. IRW-82 preserved the failure, correction, and passing retest from both linked issues.</p>
+          </article>
+          <article class="decision-card">
+            <p class="decision-number">UAT-006</p>
+            <h3>Defect traceability</h3>
+            <p>NEG-001 intentionally omitted its source test ID. IRW-87 was created after the failure, the missing traceability was added, and the same inspection passed on retest.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="results" aria-labelledby="results-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Results</p>
+          <h2 id="results-title">Core v1.0 is complete against the defined requirements</h2>
+          <p>The figures describe this fictional project only. They are not business-impact or production metrics.</p>
+        </div>
+        <div class="metric-grid" aria-label="IRW results">
+          <article><strong>10</strong><span>Completed requirements</span></article>
+          <article><strong>10/10</strong><span>Final UAT cases passed</span></article>
+          <article><strong>2</strong><span>Bugs corrected and retested</span></article>
+          <article><strong>6</strong><span>Jira workflow states</span></article>
+          <article><strong>35</strong><span>Completed core Jira items</span></article>
+          <article><strong>3</strong><span>Planned v1.1 items</span></article>
+        </div>
+        <div class="evidence-copy">
+          <p>The core records include the requirements baseline, SR-001 implementation, UAT and Bug register, readiness and rollback plan, risk and decision log, support runbook, and completion summary.</p>
+          <p>No customer result, production deployment, financial impact, performance metric, Jira dashboard, or Forge runtime is claimed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-section" id="decisions" aria-labelledby="decisions-title">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="eyebrow">Decisions and tradeoffs</p>
+          <h2 id="decisions-title">A few decisions mattered more than the amount of documentation</h2>
+        </div>
+        <div class="implementation-grid">
+          <article><h3>Use Blocked only when something actually prevents progress</h3><p>Ordinary incomplete work stayed in To Do, Ready, or In Progress. Blocked represented a concrete prerequisite.</p></article>
+          <article><h3>Keep Validation separate from Done</h3><p>Implementation could be complete without yet being accepted. The workflow kept that distinction visible.</p></article>
+          <article><h3>Preserve failed tests</h3><p>The failed results, corrections, and retests remain part of the project instead of being replaced by a cleaner-looking story.</p></article>
+          <article><h3>Move unfinished features into v1.1</h3><p>The Jira dashboard and Forge designs are useful, but specifications are not working features. They remain planned until implemented and tested.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tinted case-section" id="roadmap" aria-labelledby="roadmap-title">
+      <div class="shell case-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">v1.1 roadmap</p>
+          <h2 id="roadmap-title">Build a small reporting layer and Forge component next</h2>
+        </div>
+        <div class="case-copy">
+          <p>The first Jira reporting release will create five saved filters and one dashboard covering requirements, open core work, open Bugs, Validation, and the v1.1 roadmap.</p>
+          <p>The first Forge release will provide a read-only project page that checks a small set of high-value Jira readiness conditions, links failed checks to Jira issues, and reports roadmap work separately.</p>
+          <p>I am completing the Atlassian Forge certification path and related hands-on preparation before implementation begins. No source, app identity, build, deployment, installation, or runtime result is claimed yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section limits-section case-section" id="scope" aria-labelledby="scope-title">
+      <div class="shell bridge-grid">
+        <div>
+          <p class="eyebrow eyebrow-light">Scope</p>
+          <h2 id="scope-title">A fictional implementation, not a customer deployment</h2>
+        </div>
+        <div class="bridge-copy">
+          <p>IRW demonstrates requirements analysis, Jira and Confluence organization, implementation planning, UAT, Bug handling, readiness decisions, rollback planning, and support handoff.</p>
+          <p>It does not represent customer work, production administration, measured outcomes, a completed Jira dashboard, or a deployed Forge application.</p>
+        </div>
+      </div>
+    </section>
+
+    <nav class="project-switcher shell" aria-label="Explore other projects">
+      <a href="../projects/workflow-intake-analysis.html"><span>Workflow and data</span><strong>Workflow Intake Analysis</strong></a>
+      <a href="../projects/saas-integration-reliability-support-troubleshooting.html"><span>Integration reliability</span><strong>SaaS Integration Reliability</strong></a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p>Tyler Windes - Implementation Readiness Workspace</p>
+      <p><a href="../index.html">Return to portfolio</a></p>
+    </div>
+  </footer>
+</body>
+</html>

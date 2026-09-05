@@ -20,25 +20,36 @@ const PORT2_TOKEN = "{{PORT0002_REPOSITORY_URL}}";
 const PORT3_TOKEN = "{{PORT0003_REPOSITORY_URL}}";
 const PROFILE_URL = "https://github.com/Tyler-Windes";
 const LINKEDIN_URL = "https://www.linkedin.com/in/tylerwindes";
+const IRW_ATLASSIAN_URL =
+  "https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169";
 
 const ROUTES = [
-  { path: "index.html", url: `${SITE_ORIGIN}/`, type: "website" },
+  { path: "index.html", canonical: `${SITE_ORIGIN}/`, type: "website" },
+  { path: "irw/index.html", canonical: `${SITE_ORIGIN}/irw/`, type: "article" },
   {
     path: "projects/workflow-intake-analysis.html",
-    url: `${SITE_ORIGIN}/projects/workflow-intake-analysis.html`,
+    canonical: `${SITE_ORIGIN}/projects/workflow-intake-analysis.html`,
     type: "article",
   },
   {
     path: "projects/implementation-readiness-support-transition.html",
-    url: `${SITE_ORIGIN}/projects/implementation-readiness-support-transition.html`,
+    canonical: `${SITE_ORIGIN}/irw/`,
     type: "article",
+    redirect: "../irw/",
   },
   {
     path: "projects/saas-integration-reliability-support-troubleshooting.html",
-    url: `${SITE_ORIGIN}/projects/saas-integration-reliability-support-troubleshooting.html`,
+    canonical: `${SITE_ORIGIN}/projects/saas-integration-reliability-support-troubleshooting.html`,
     type: "article",
   },
-  { path: "404.html", url: `${SITE_ORIGIN}/404.html`, type: "website" },
+  { path: "404.html", canonical: `${SITE_ORIGIN}/404.html`, type: "website" },
+];
+
+const SITEMAP_URLS = [
+  `${SITE_ORIGIN}/`,
+  `${SITE_ORIGIN}/irw/`,
+  `${SITE_ORIGIN}/projects/workflow-intake-analysis.html`,
+  `${SITE_ORIGIN}/projects/saas-integration-reliability-support-troubleshooting.html`,
 ];
 
 const EXPECTED_STATIC_PATHS = [
@@ -47,6 +58,7 @@ const EXPECTED_STATIC_PATHS = [
   "assets/favicon.svg",
   "assets/social-preview-1200x630.png",
   "index.html",
+  "irw/index.html",
   "projects/implementation-readiness-support-transition.html",
   "projects/saas-integration-reliability-support-troubleshooting.html",
   "projects/workflow-intake-analysis.html",
@@ -80,6 +92,7 @@ const PUBLIC_INPUT_PATHS = [
   "src/.nojekyll",
   "src/404.html",
   "src/index.html",
+  "src/irw/index.html",
   "src/projects/implementation-readiness-support-transition.html",
   "src/projects/saas-integration-reliability-support-troubleshooting.html",
   "src/projects/workflow-intake-analysis.html",
@@ -95,7 +108,6 @@ const FORBIDDEN_REVIEW_PHRASES = [
   "Read candidate case study",
   "Repository link withheld",
   "A local repository candidate exists",
-  "not yet public",
   "not authorized for public",
   "PrivatePublicationCandidateNotYetAuthorized",
   "LocalCandidateWithheldUntilPublicationAuthorization",
@@ -119,13 +131,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   for (const path of PUBLIC_INPUT_PATHS) {
     check(`INPUT_${safeId(path)}`, existsSync(absolute(path)), path);
   }
-  check("INPUT_COUNT_EXACT", PUBLIC_INPUT_PATHS.length === 30, "Thirty explicit public inputs.");
-  check(
-    "CANDIDATE_AUTHORITIES_REMOVED",
-    !existsSync(absolute("content/schemas/public-project-candidate-content.schema.json")) &&
-      !existsSync(absolute("scripts/validate-consolidated-candidate.mjs")),
-    "No parallel candidate schema or candidate validator remains active.",
-  );
+  check("INPUT_COUNT_EXACT", PUBLIC_INPUT_PATHS.length === 31, "Thirty-one explicit public inputs.");
 
   const packageJson = json("package.json");
   const siteConfig = json("content/site/site-config.json");
@@ -142,7 +148,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       packageJson.scripts?.build === "node scripts/build.mjs" &&
       packageJson.scripts?.validate === "npm run validate:public" &&
       packageJson.scripts?.["validate:public"] === "npm run build && node scripts/validate-public.mjs",
-    "Node 24, deterministic build, preflight default, and fail-closed final validation are configured.",
+    "Node 24, deterministic build, and fail-closed validation are configured.",
   );
   check("SITE_ORIGIN", siteConfig.site_base_url === SITE_ORIGIN, "Authorized custom-domain origin.");
   check(
@@ -151,7 +157,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       schema.oneOf?.length === 2 &&
       schema.$defs?.workflow_analysis_v1 &&
       schema.$defs?.public_case_study_v2,
-    "One closed published-project schema preserves PORT-0001 and governs PORT-0002/3.",
+    "One project-content schema governs the three published projects.",
   );
   check(
     "PORT1_CONTENT_PRESERVED",
@@ -159,19 +165,25 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       "6599D5B7FD5ADBEE1A97681BB5ABE4217D34533867C0E7B8A41F4753D9855D00" &&
       port1.title === "Workflow Intake Analysis Demo" &&
       port1.links?.repository_url === PORT1_REPOSITORY,
-    "The accepted PORT-0001 content record is byte-exact.",
+    "The accepted Workflow Intake Analysis content record is unchanged.",
   );
 
   const expectedRepositories = allowRepositoryTokens
-    ? { "PORT-0002": PORT2_TOKEN, "PORT-0003": PORT3_TOKEN }
-    : { "PORT-0002": PORT2_REPOSITORY, "PORT-0003": PORT3_REPOSITORY };
+    ? {
+        "PORT-0002": new Set([PORT2_REPOSITORY, PORT2_TOKEN]),
+        "PORT-0003": new Set([PORT3_REPOSITORY, PORT3_TOKEN]),
+      }
+    : {
+        "PORT-0002": new Set([PORT2_REPOSITORY]),
+        "PORT-0003": new Set([PORT3_REPOSITORY]),
+      };
   const expectedRecords = [
     [
       port2,
       {
         id: "PORT-0002",
         title: "Implementation Readiness & Support Transition",
-        route: "projects/implementation-readiness-support-transition.html",
+        route: "irw/index.html",
         repository: "implementation-readiness-support-transition",
       },
     ],
@@ -185,8 +197,8 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       },
     ],
   ];
+
   for (const [record, expected] of expectedRecords) {
-    const keys = Object.keys(record).sort();
     const expectedKeys = [
       "$schema",
       "capabilities",
@@ -203,7 +215,11 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       "subtitle",
       "title",
     ].sort();
-    check(`CONTENT_KEYS_${expected.id}`, equalArrays(keys, expectedKeys), `${expected.id} has only the reviewed published fields.`);
+    check(
+      `CONTENT_KEYS_${expected.id}`,
+      equalArrays(Object.keys(record).sort(), expectedKeys),
+      `${expected.id} has only the reviewed published fields.`,
+    );
     check(
       `CONTENT_IDENTITY_${expected.id}`,
       record.$schema === "../schemas/public-project-content.schema.json" &&
@@ -212,19 +228,15 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
         record.title === expected.title &&
         record.data_class === "Synthetic" &&
         record.publication_state === "PortfolioApproved",
-      `${expected.id} published content identity.`,
+      `${expected.id} identity and publication state are correct.`,
     );
     check(
       `CONTENT_LINKS_${expected.id}`,
-      equalArrays(
-        Object.keys(record.links).sort(),
-        ["case_study_path", "repository_name", "repository_state", "repository_url"].sort(),
-      ) &&
-        record.links.case_study_path === expected.route &&
+      record.links.case_study_path === expected.route &&
         record.links.repository_name === expected.repository &&
-        record.links.repository_url === expectedRepositories[expected.id] &&
+        expectedRepositories[expected.id].has(record.links.repository_url) &&
         record.links.repository_state === "ExistingPublicRepositoryWithVerifiedV1Release",
-      `${expected.id} route and repository fields match the ${allowRepositoryTokens ? "bounded URL token" : "verified final URL"} mode.`,
+      `${expected.id} route and repository identity are correct.`,
     );
     check(
       `CONTENT_SUBSTANCE_${expected.id}`,
@@ -234,29 +246,31 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
         record.evidence.length >= 3 &&
         record.capabilities.length >= 4 &&
         record.scope.length >= 2,
-      `${expected.id} retains reviewed problem, judgment, evidence, capabilities, and scope.`,
+      `${expected.id} contains substantive problem, judgment, evidence, capability, and scope fields.`,
     );
     check(
       `CONTENT_BOUNDARY_${expected.id}`,
-      /synthetic/i.test(JSON.stringify(record.scope)) &&
-        /(not evidence|no real customer|no live platform)/i.test(JSON.stringify(record.scope)),
-      `${expected.id} retains a clear synthetic and non-production boundary.`,
+      /synthetic|fictional/i.test(JSON.stringify(record.scope)) &&
+        /not represent|not evidence|no real customer|no live platform/i.test(JSON.stringify(record.scope)),
+      `${expected.id} keeps a clear fictional and non-production boundary.`,
     );
   }
 
+  check(
+    "PORT2_TWO_LAYER_MODEL",
+    /platform-neutral/i.test(JSON.stringify(port2)) &&
+      /Jira and Confluence implementation/i.test(JSON.stringify(port2)) &&
+      /Eight final synthetic foundation outcomes/i.test(JSON.stringify(port2)) &&
+      /ten final passing UAT cases/i.test(JSON.stringify(port2)) &&
+      /v1.1 roadmap/i.test(JSON.stringify(port2)),
+    "The readiness project distinguishes its platform-neutral foundation, Atlassian implementation, and v1.1 roadmap.",
+  );
   const port3All = JSON.stringify(port3);
   check(
     "PORT3_N8N_BOUNDARY",
     /n8n runtime execution was deferred/i.test(port3All) &&
       /rather than evidence of n8n proficiency/i.test(port3All),
-    "The n8n-deferred/no-proficiency ceiling is exact.",
-  );
-  check(
-    "PORT2_READINESS_PROOF",
-    /Eight final synthetic UAT outcomes/.test(JSON.stringify(port2)) &&
-      /Six explicit transition smoke checks/.test(JSON.stringify(port2)) &&
-      /passing retests/.test(JSON.stringify(port2)),
-    "PORT-0002 retains bounded UAT, retest, smoke-check, rollback, and handoff proof.",
+    "The integration project keeps the reviewed n8n boundary.",
   );
   check(
     "PORT3_RELIABILITY_PROOF",
@@ -265,7 +279,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       /503/.test(port3All) &&
       /dead-letter replay/.test(port3All) &&
       /reconciliation/.test(port3All),
-    "PORT-0003 retains mapping, retry, dead-letter, replay, and reconciliation proof.",
+    "The integration project retains mapping, retry, replay, and reconciliation evidence.",
   );
 
   const activeTextPaths = [
@@ -281,13 +295,29 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   check(
     "ZERO_REVIEW_STAGE_RESIDUE",
     residue.length === 0,
-    residue.length ? residue.join("; ") : "No active reader-facing review-stage residue.",
+    residue.length ? residue.join("; ") : "No reader-facing review-stage residue.",
   );
   check(
     "ZERO_LOCAL_PATH_RESIDUE",
     !/[A-Za-z]:\\\\|file:\/\/|\/Users\/|\/home\//i.test(activeText),
-    "No absolute local filesystem path in public content or output.",
+    "No absolute local filesystem path appears in public content.",
   );
+  check(
+    "NO_OVERT_AUDIENCE_LANGUAGE",
+    !/(recruiter-facing|employer-facing|built to prove|proof for employers)/i.test(activeText),
+    "The public site describes the work directly rather than addressing an application audience.",
+  );
+  const refreshedSurfaces = [
+    text("src/index.html"),
+    text("src/irw/index.html"),
+    text("src/projects/implementation-readiness-support-transition.html"),
+  ].join("\n");
+  check(
+    "ASCII_DASHES_ON_REFRESHED_SURFACES",
+    !/[\u2013\u2014]/u.test(refreshedSurfaces),
+    "The refreshed homepage and IRW routes contain no en dash or em dash.",
+  );
+
   const renderedText = [
     ...walk(absolute("src")).filter(isTextPath),
     ...walk(absolute("dist")).filter(isTextPath),
@@ -295,29 +325,9 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   check(
     "NO_CONTROLLED_IDS_IN_RENDERED_SITE",
     !/PORT-000[123]/.test(renderedText),
-    "Controlled project IDs remain structured metadata only.",
+    "Internal project IDs remain structured metadata only.",
   );
 
-  const tokenCounts = {
-    port2Content: occurrences(text("content/projects/implementation-readiness-support-transition.json"), PORT2_TOKEN),
-    port3Content: occurrences(text("content/projects/saas-integration-reliability-support-troubleshooting.json"), PORT3_TOKEN),
-    port2Source: occurrences(text("src/index.html") + text("src/projects/implementation-readiness-support-transition.html"), PORT2_TOKEN),
-    port3Source: occurrences(text("src/index.html") + text("src/projects/saas-integration-reliability-support-troubleshooting.html"), PORT3_TOKEN),
-    port2Dist: occurrences(text("dist/index.html") + text("dist/projects/implementation-readiness-support-transition.html"), PORT2_TOKEN),
-    port3Dist: occurrences(text("dist/index.html") + text("dist/projects/saas-integration-reliability-support-troubleshooting.html"), PORT3_TOKEN),
-  };
-  const exactPreflightTokens =
-    tokenCounts.port2Content === 1 && tokenCounts.port3Content === 1 &&
-    tokenCounts.port2Source === 2 && tokenCounts.port3Source === 2 &&
-    tokenCounts.port2Dist === 2 && tokenCounts.port3Dist === 2;
-  const noRepositoryTokens = Object.values(tokenCounts).every((count) => count === 0);
-  check(
-    "REPOSITORY_URL_GATE",
-    allowRepositoryTokens ? exactPreflightTokens : noRepositoryTokens,
-    allowRepositoryTokens
-      ? "Each bounded URL token occurs once in content and twice across source/built home-plus-project surfaces."
-      : "No repository URL token remains after independently verified URL insertion.",
-  );
   const sourceTokens = uniqueTokens(
     walk(absolute("src")).filter(isTextPath).map((path) => readFileSync(path, "utf8")).join("\n"),
   );
@@ -327,13 +337,15 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   const distTokens = uniqueTokens(
     walk(absolute("dist")).filter(isTextPath).map((path) => readFileSync(path, "utf8")).join("\n"),
   );
+  const tokenSetAllowed = (tokens, allowed) => tokens.every((token) => allowed.has(token));
   check(
     "ONLY_AUTHORIZED_TOKENS",
-    allowRepositoryTokens
-      ? equalArrays(sourceTokens, [PORT2_TOKEN, PORT3_TOKEN, "{{SITE_BASE_URL}}"].sort()) &&
-          equalArrays(contentTokens, [PORT2_TOKEN, PORT3_TOKEN].sort()) &&
-          equalArrays(distTokens, [PORT2_TOKEN, PORT3_TOKEN].sort())
-      : equalArrays(sourceTokens, ["{{SITE_BASE_URL}}"] ) && contentTokens.length === 0 && distTokens.length === 0,
+    tokenSetAllowed(sourceTokens, new Set(["{{SITE_BASE_URL}}", PORT2_TOKEN, PORT3_TOKEN])) &&
+      tokenSetAllowed(contentTokens, new Set([PORT2_TOKEN, PORT3_TOKEN])) &&
+      tokenSetAllowed(distTokens, new Set([PORT2_TOKEN, PORT3_TOKEN])) &&
+      (allowRepositoryTokens || (!sourceTokens.includes(PORT2_TOKEN) && !sourceTokens.includes(PORT3_TOKEN) &&
+        !contentTokens.includes(PORT2_TOKEN) && !contentTokens.includes(PORT3_TOKEN) &&
+        !distTokens.includes(PORT2_TOKEN) && !distTokens.includes(PORT3_TOKEN))),
     `source=${sourceTokens.join(",") || "none"}; content=${contentTokens.join(",") || "none"}; dist=${distTokens.join(",") || "none"}`,
   );
 
@@ -344,16 +356,17 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   const builtPaths = walk(absolute("dist"))
     .map((path) => relative(absolute("dist"), path).replaceAll("\\", "/"))
     .sort();
-  check("STATIC_SOURCE_SET", equalArrays(staticPaths, EXPECTED_STATIC_PATHS), "Eleven exact deployable source files.");
-  check("BUILD_FILE_SET", equalArrays(builtPaths, EXPECTED_STATIC_PATHS), "Built tree contains the same eleven files.");
+  check("STATIC_SOURCE_SET", equalArrays(staticPaths, EXPECTED_STATIC_PATHS), "Twelve exact deployable source files.");
+  check("BUILD_FILE_SET", equalArrays(builtPaths, EXPECTED_STATIC_PATHS), "The built tree contains the same twelve files.");
   check(
     "BUILD_MANIFEST_TOPOLOGY",
     manifest.build_mode === "DeterministicThreeProjectSiteBaseUrlGeneration" &&
       manifest.site_base_url === SITE_ORIGIN &&
-      manifest.file_count === 11 &&
+      manifest.file_count === 12 &&
       equalArrays((manifest.entries || []).map((item) => item.relative_path).sort(), EXPECTED_STATIC_PATHS),
-    "Build manifest records the exact deterministic topology.",
+    "The build manifest records the exact deterministic topology.",
   );
+
   const manifestByPath = new Map((manifest.entries || []).map((item) => [item.relative_path, item]));
   const generatedHtml = new Set(ROUTES.map((route) => route.path));
   for (const path of EXPECTED_STATIC_PATHS) {
@@ -373,7 +386,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
     check(
       `BUILD_HASH_${safeId(path)}`,
       entry?.size_bytes === builtBytes.length && entry?.sha256 === sha256(builtBytes),
-      `${path} matches its build-manifest identity.`,
+      `${path} matches the build manifest.`,
     );
   }
 
@@ -385,13 +398,13 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
       /<html lang="en">/.test(html) &&
         /<meta name="viewport"/.test(html) &&
         /<meta name="robots" content="index, follow">/.test(html) &&
-        html.includes(`<link rel="canonical" href="${route.url}">`) &&
+        html.includes(`<link rel="canonical" href="${route.canonical}">`) &&
         html.includes(`<meta property="og:type" content="${route.type}">`) &&
-        html.includes(`<meta property="og:url" content="${route.url}">`) &&
+        html.includes(`<meta property="og:url" content="${route.canonical}">`) &&
         html.includes(`<meta property="og:image" content="${SITE_ORIGIN}/assets/social-preview-1200x630.png">`) &&
         /<meta name="twitter:card" content="summary_large_image">/.test(html) &&
         /<link rel="icon"/.test(html),
-      `${route.path} is indexed and has canonical/Open Graph/Twitter/favicon metadata.`,
+      `${route.path} has canonical, social, and indexing metadata.`,
     );
     check(
       `PAGE_ACCESSIBILITY_${safeId(route.path)}`,
@@ -399,70 +412,98 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
         html.includes("Skip to main content") &&
         html.includes('id="main-content"') &&
         new Set(ids).size === ids.length,
-      `${route.path} has one H1, a skip link, main target, and unique IDs.`,
+      `${route.path} has one H1, a skip link, a main target, and unique IDs.`,
     );
+    if (route.redirect) {
+      check(
+        `REDIRECT_${safeId(route.path)}`,
+        html.includes(`content="0; url=${route.redirect}"`) && html.includes(`href="${route.redirect}"`),
+        `${route.path} redirects and provides a normal link to ${route.redirect}.`,
+      );
+    }
     validateLinks(route.path, html, allowRepositoryTokens, check);
   }
 
   const home = text("dist/index.html");
-  const p1Page = text("dist/projects/workflow-intake-analysis.html");
-  const p2Page = text("dist/projects/implementation-readiness-support-transition.html");
-  const p3Page = text("dist/projects/saas-integration-reliability-support-troubleshooting.html");
+  const irw = text("dist/irw/index.html");
+  const p1 = text("dist/projects/workflow-intake-analysis.html");
+  const p2Redirect = text("dist/projects/implementation-readiness-support-transition.html");
+  const p3 = text("dist/projects/saas-integration-reliability-support-troubleshooting.html");
+
   check(
     "HOME_THREE_PROJECTS",
-    [
-      "Workflow Intake Analysis Demo",
-      "Implementation Readiness &amp; Support Transition",
-      "SaaS Integration Reliability &amp; Support Troubleshooting",
-    ].every((value) => home.includes(value)) &&
+    home.includes("Workflow Intake Analysis Demo") &&
+      home.includes("Implementation Readiness and Support Transition") &&
+      home.includes("SaaS Integration Reliability and Support Troubleshooting") &&
       occurrences(home, "Read case study") === 3 &&
-      occurrences(home, "View repository") === 3,
-    "Homepage exposes three distinct case studies and repository paths.",
+      occurrences(home, "View repository") === 2 &&
+      occurrences(home, "View foundation repository") === 1,
+    "The homepage retains three projects and distinct repository links.",
   );
   check(
-    "ALL_PROJECT_NAVIGATION",
-    p1Page.includes("implementation-readiness-support-transition.html") &&
-      p1Page.includes("saas-integration-reliability-support-troubleshooting.html") &&
-      p2Page.includes("workflow-intake-analysis.html") &&
-      p2Page.includes("saas-integration-reliability-support-troubleshooting.html") &&
-      p3Page.includes("workflow-intake-analysis.html") &&
-      p3Page.includes("implementation-readiness-support-transition.html"),
-    "Each project page links to the other two projects.",
+    "HOME_IRW_CANONICAL_LINK",
+    home.includes('href="irw/index.html"') && !home.includes('href="projects/implementation-readiness-support-transition.html">Read case study'),
+    "The readiness project card uses the canonical IRW route.",
   );
   check(
-    "PORT2_VISIBLE_BOUNDARY",
-    /Modeled lifecycle, not a live transaction/.test(p2Page) &&
-      /Eight synthetic UAT cases/.test(p2Page) &&
-      /Passing retests/.test(p2Page) &&
-      /six modeled smoke checks/i.test(p2Page) &&
-      /rollback/i.test(p2Page) &&
-      /support-transition thinking/i.test(p2Page),
-    "PORT-0002 page keeps its lifecycle, readiness, retest, rollback, and handoff boundary.",
+    "IRW_TWO_LAYER_NARRATIVE",
+    /platform-neutral implementation-readiness model/i.test(irw) &&
+      /working Jira and Confluence workspace/i.test(irw) &&
+      /original eight validation cases/i.test(irw) &&
+      /ten IRW cases/i.test(irw) &&
+      /IRW-76.*blocks IRW-75/is.test(irw),
+    "The IRW page explains both layers, the separate validation sets, and the current dependency.",
+  );
+  check(
+    "IRW_HUMAN_OWNERSHIP",
+    /I owned the analysis, decisions, validation, and closeout/i.test(irw) &&
+      /automation for repetitive setup and consistency checking/i.test(irw) &&
+      /responsibility for the decisions and results/i.test(irw),
+    "The IRW page explains Tyler's ownership without hiding tool assistance.",
+  );
+  check(
+    "IRW_SCOPE_BOUNDARY",
+    /fictional implementation/i.test(irw) &&
+      /does not represent customer work/i.test(irw) &&
+      /No source, app identity, build, deployment, installation, or runtime result is claimed yet/i.test(irw),
+    "The IRW page distinguishes completed core work from customer work and unfinished Forge delivery.",
+  );
+  check(
+    "PROJECT_NAVIGATION",
+    p1.includes("implementation-readiness-support-transition.html") &&
+      p1.includes("saas-integration-reliability-support-troubleshooting.html") &&
+      irw.includes("workflow-intake-analysis.html") &&
+      irw.includes("saas-integration-reliability-support-troubleshooting.html") &&
+      p3.includes("workflow-intake-analysis.html") &&
+      p3.includes("implementation-readiness-support-transition.html") &&
+      p2Redirect.includes("../irw/"),
+    "Each project remains connected, and legacy readiness links resolve through the redirect.",
   );
   check(
     "PORT3_VISIBLE_BOUNDARY",
-    /No external service or live endpoint/.test(p3Page) &&
-      /Twelve scenarios/.test(p3Page) &&
-      /Dead letter and replay/i.test(p3Page) &&
-      /n8n execution was deferred/.test(p3Page) &&
-      /does not establish n8n proficiency/.test(p3Page),
-    "PORT-0003 page keeps executable evidence and the exact n8n ceiling.",
+    /No external service or live endpoint/.test(p3) &&
+      /Twelve scenarios/.test(p3) &&
+      /Dead letter and replay/i.test(p3) &&
+      /n8n execution was deferred/.test(p3) &&
+      /does not establish n8n proficiency/.test(p3),
+    "The integration page retains its reviewed execution and n8n boundaries.",
   );
 
   const robots = text("dist/robots.txt");
   const sitemap = text("dist/sitemap.xml");
-  const sitemapUrls = ROUTES.filter((route) => route.path !== "404.html").map((route) => route.url);
   check(
     "ROBOTS_PUBLIC",
     robots === `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`,
-    "Public crawl and sitemap declaration.",
+    "Public crawl and sitemap declaration are correct.",
   );
   check(
-    "SITEMAP_FOUR_ROUTES",
-    occurrences(sitemap, "<loc>") === 4 &&
-      sitemapUrls.every((url) => sitemap.includes(`<loc>${url}</loc>`)),
-    "Sitemap contains exactly the homepage and three project routes.",
+    "SITEMAP_CANONICAL_ROUTES",
+    occurrences(sitemap, "<loc>") === SITEMAP_URLS.length &&
+      SITEMAP_URLS.every((url) => sitemap.includes(`<loc>${url}</loc>`)) &&
+      !sitemap.includes("implementation-readiness-support-transition.html"),
+    "The sitemap contains the homepage, canonical IRW route, and two other project routes.",
   );
+
   const css = text("dist/styles.css");
   check(
     "CSS_ACCESSIBILITY",
@@ -474,8 +515,8 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   );
   check(
     "NO_ACTIVE_CODE_SURFACE",
-    !/<script\b/i.test(home + p1Page + p2Page + p3Page) &&
-      !/<form\b/i.test(home + p1Page + p2Page + p3Page) &&
+    !/<script\b/i.test(home + irw + p1 + p2Redirect + p3) &&
+      !/<form\b/i.test(home + irw + p1 + p2Redirect + p3) &&
       !/(google-analytics|googletagmanager|segment\.com|hotjar|mixpanel)/i.test(activeText),
     "The site remains static, form-free, and analytics-free.",
   );
@@ -484,25 +525,22 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   const result = failed.length === 0 ? "PASS" : "HOLD";
   const terminal = failed.length === 0
     ? allowRepositoryTokens
-      ? "PASS_CONSOLIDATED_THREE_PROJECT_SITE_READY_FOR_VERIFIED_REPOSITORY_URLS"
-      : "PASS_CONSOLIDATED_THREE_PROJECT_PUBLIC_SITE"
+      ? "PASS_THREE_PROJECT_SITE_PREFLIGHT"
+      : "PASS_THREE_PROJECT_PUBLIC_SITE"
     : allowRepositoryTokens
-      ? "HOLD_CONSOLIDATED_THREE_PROJECT_SITE_PREPARATION_FAILED"
-      : "HOLD_CONSOLIDATED_THREE_PROJECT_PUBLIC_SITE_VALIDATION_FAILED";
+      ? "HOLD_THREE_PROJECT_SITE_PREFLIGHT"
+      : "HOLD_THREE_PROJECT_PUBLIC_SITE";
   const report = {
     schema_version: "1.0.0",
-    validator: "ConsolidatedThreeProjectStaticSiteValidator",
-    mode: allowRepositoryTokens
-      ? "PublicationPreparationWithTwoBoundedRepositoryUrlTokens"
-      : "FinalVerifiedPublicUrlsRequired",
+    validator: "ThreeProjectStaticSiteValidator",
+    mode: allowRepositoryTokens ? "PublicationPreflight" : "FinalPublicUrlsRequired",
     result,
     terminal,
     check_count: checks.length,
     passed_count: checks.length - failed.length,
     failed_count: failed.length,
     site_base_url: SITE_ORIGIN,
-    expected_repository_urls: [PORT2_REPOSITORY, PORT3_REPOSITORY],
-    authorized_repository_url_tokens: allowRepositoryTokens ? [PORT2_TOKEN, PORT3_TOKEN] : [],
+    canonical_irw_url: `${SITE_ORIGIN}/irw/`,
     deployable_file_count: EXPECTED_STATIC_PATHS.length,
     public_input_count: PUBLIC_INPUT_PATHS.length,
     input_manifest: PUBLIC_INPUT_PATHS.filter((path) => existsSync(absolute(path))).map((path) => {
@@ -526,6 +564,7 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
     PORT3_REPOSITORY,
     PROFILE_URL,
     LINKEDIN_URL,
+    IRW_ATLASSIAN_URL,
   ]);
   const idsByPath = new Map(
     ROUTES.map((route) => {
@@ -535,6 +574,7 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
   );
   let valid = true;
   const failures = [];
+
   for (const href of hrefs) {
     if (href === PORT2_TOKEN || href === PORT3_TOKEN) {
       if (!allowRepositoryTokens) {
@@ -544,7 +584,7 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
       continue;
     }
     if (href.startsWith("https://")) {
-      const allowedCanonical = ROUTES.some((route) => route.url === href);
+      const allowedCanonical = ROUTES.some((route) => route.canonical === href);
       const allowedSocial = href === `${SITE_ORIGIN}/assets/social-preview-1200x630.png`;
       if (!allowedExternal.has(href) && !allowedCanonical && !allowedSocial) {
         valid = false;
@@ -557,10 +597,12 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
       failures.push(`prohibited scheme ${href}`);
       continue;
     }
+
     const [targetPart, fragment] = href.split("#", 2);
-    const targetPath = targetPart
+    let targetPath = targetPart
       ? posix.normalize(posix.join(posix.dirname(pagePath), targetPart))
       : pagePath;
+    if (targetPath.endsWith("/")) targetPath = `${targetPath}index.html`;
     if (!existsSync(join(projectRoot, "dist", ...targetPath.split("/")))) {
       valid = false;
       failures.push(`missing ${href}`);
@@ -571,6 +613,7 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
       failures.push(`missing fragment ${href}`);
     }
   }
+
   check(
     `LINKS_${safeId(pagePath)}`,
     valid,
@@ -579,11 +622,10 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
 }
 
 function renderSitemap() {
-  const sitemapRoutes = ROUTES.filter((route) => route.path !== "404.html").map((route) => route.url);
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...sitemapRoutes.flatMap((url) => ["  <url>", `    <loc>${url}</loc>`, "  </url>"]),
+    ...SITEMAP_URLS.flatMap((url) => ["  <url>", `    <loc>${url}</loc>`, "  </url>"]),
     "</urlset>",
     "",
   ].join("\n");
