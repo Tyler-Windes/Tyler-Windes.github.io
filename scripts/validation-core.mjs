@@ -22,6 +22,8 @@ const PROFILE_URL = "https://github.com/Tyler-Windes";
 const LINKEDIN_URL = "https://www.linkedin.com/in/tylerwindes";
 const IRW_ATLASSIAN_URL =
   "https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169";
+const DEFAULT_SOCIAL_IMAGE = "assets/social-preview-1200x630.png";
+const IRW_SOCIAL_IMAGE = "assets/irw-social-preview.png";
 
 const ROUTES = [
   { path: "index.html", canonical: `${SITE_ORIGIN}/`, type: "website" },
@@ -56,6 +58,7 @@ const EXPECTED_STATIC_PATHS = [
   ".nojekyll",
   "404.html",
   "assets/favicon.svg",
+  "assets/irw-social-preview.png",
   "assets/social-preview-1200x630.png",
   "index.html",
   "irw/index.html",
@@ -75,6 +78,7 @@ const PUBLIC_INPUT_PATHS = [
   "LICENSE",
   "README.md",
   "assets/favicon.svg",
+  "assets/irw-social-preview.png",
   "assets/social-preview-1200x630.png",
   "content/projects/implementation-readiness-support-transition.json",
   "content/projects/saas-integration-reliability-support-troubleshooting.json",
@@ -131,7 +135,7 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   for (const path of PUBLIC_INPUT_PATHS) {
     check(`INPUT_${safeId(path)}`, existsSync(absolute(path)), path);
   }
-  check("INPUT_COUNT_EXACT", PUBLIC_INPUT_PATHS.length === 31, "Thirty-one explicit public inputs.");
+  check("INPUT_COUNT_EXACT", PUBLIC_INPUT_PATHS.length === 32, "Thirty-two explicit public inputs.");
 
   const packageJson = json("package.json");
   const siteConfig = json("content/site/site-config.json");
@@ -356,13 +360,13 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   const builtPaths = walk(absolute("dist"))
     .map((path) => relative(absolute("dist"), path).replaceAll("\\", "/"))
     .sort();
-  check("STATIC_SOURCE_SET", equalArrays(staticPaths, EXPECTED_STATIC_PATHS), "Twelve exact deployable source files.");
-  check("BUILD_FILE_SET", equalArrays(builtPaths, EXPECTED_STATIC_PATHS), "The built tree contains the same twelve files.");
+  check("STATIC_SOURCE_SET", equalArrays(staticPaths, EXPECTED_STATIC_PATHS), "Thirteen exact deployable source files.");
+  check("BUILD_FILE_SET", equalArrays(builtPaths, EXPECTED_STATIC_PATHS), "The built tree contains the same thirteen files.");
   check(
     "BUILD_MANIFEST_TOPOLOGY",
     manifest.build_mode === "DeterministicThreeProjectSiteBaseUrlGeneration" &&
       manifest.site_base_url === SITE_ORIGIN &&
-      manifest.file_count === 12 &&
+      manifest.file_count === 13 &&
       equalArrays((manifest.entries || []).map((item) => item.relative_path).sort(), EXPECTED_STATIC_PATHS),
     "The build manifest records the exact deterministic topology.",
   );
@@ -392,6 +396,8 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
 
   for (const route of ROUTES) {
     const html = text(`dist/${route.path}`);
+    const isIrwRoute = route.canonical === `${SITE_ORIGIN}/irw/`;
+    const socialImage = isIrwRoute ? IRW_SOCIAL_IMAGE : DEFAULT_SOCIAL_IMAGE;
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
     check(
       `PAGE_METADATA_${safeId(route.path)}`,
@@ -401,11 +407,22 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
         html.includes(`<link rel="canonical" href="${route.canonical}">`) &&
         html.includes(`<meta property="og:type" content="${route.type}">`) &&
         html.includes(`<meta property="og:url" content="${route.canonical}">`) &&
-        html.includes(`<meta property="og:image" content="${SITE_ORIGIN}/assets/social-preview-1200x630.png">`) &&
+        html.includes(`<meta property="og:image" content="${SITE_ORIGIN}/${socialImage}">`) &&
         /<meta name="twitter:card" content="summary_large_image">/.test(html) &&
         /<link rel="icon"/.test(html),
       `${route.path} has canonical, social, and indexing metadata.`,
     );
+    if (isIrwRoute) {
+      check(
+        `IRW_SOCIAL_METADATA_${safeId(route.path)}`,
+        html.includes('<meta property="og:image:width" content="1730">') &&
+          html.includes('<meta property="og:image:height" content="909">') &&
+          html.includes(`<meta name="twitter:image" content="${SITE_ORIGIN}/${IRW_SOCIAL_IMAGE}">`) &&
+          html.includes('<meta property="og:image:alt" content="Tyler Windes - Implementation Readiness Workspace, a synthetic case study">') &&
+          html.includes('<meta name="twitter:image:alt" content="Tyler Windes - Implementation Readiness Workspace, a synthetic case study">'),
+        `${route.path} uses the IRW card with its actual dimensions and matching text alternatives.`,
+      );
+    }
     check(
       `PAGE_ACCESSIBILITY_${safeId(route.path)}`,
       occurrences(html, "<h1") === 1 &&
@@ -429,6 +446,22 @@ export function runPublicationValidation({ allowRepositoryTokens = false } = {})
   const p1 = text("dist/projects/workflow-intake-analysis.html");
   const p2Redirect = text("dist/projects/implementation-readiness-support-transition.html");
   const p3 = text("dist/projects/saas-integration-reliability-support-troubleshooting.html");
+  const irwImage = readFileSync(absolute(`dist/${IRW_SOCIAL_IMAGE}`));
+  check(
+    "IRW_SOCIAL_IMAGE_DISTINCT_PNG",
+    irwImage.length >= 24 &&
+      irwImage.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
+      irwImage.toString("ascii", 12, 16) === "IHDR" &&
+      irwImage.readUInt32BE(16) === 1730 &&
+      irwImage.readUInt32BE(20) === 909 &&
+      !irwImage.equals(readFileSync(absolute(`dist/${DEFAULT_SOCIAL_IMAGE}`))),
+    "The IRW sharing card is a distinct PNG with metadata-matched dimensions; the Workflow Intake asset is not relabeled.",
+  );
+  check(
+    "IRW_ATLASSIAN_SIGN_IN_LABEL",
+    irw.includes(`href="${IRW_ATLASSIAN_URL}">View Atlassian case study - sign-in required</a>`),
+    "The existing Confluence destination visibly states its sign-in requirement.",
+  );
 
   check(
     "HOME_THREE_PROJECTS",
@@ -585,7 +618,8 @@ function validateLinks(pagePath, html, allowRepositoryTokens, check) {
     }
     if (href.startsWith("https://")) {
       const allowedCanonical = ROUTES.some((route) => route.canonical === href);
-      const allowedSocial = href === `${SITE_ORIGIN}/assets/social-preview-1200x630.png`;
+      const allowedSocial = [DEFAULT_SOCIAL_IMAGE, IRW_SOCIAL_IMAGE]
+        .some((image) => href === `${SITE_ORIGIN}/${image}`);
       if (!allowedExternal.has(href) && !allowedCanonical && !allowedSocial) {
         valid = false;
         failures.push(`unapproved external ${href}`);
