@@ -1,3 +1,9 @@
+# Production-format website CANDIDATE - not published
+
+Private staging source composed from existing clean public checkout and Owner-approved polished copy. Current project/site authorities remain unchanged. Build/test only inside this folder. No remote actions, deployment, social-media update, public claim release or external services are authorized. The full prior README remains below for provenance.
+
+---
+
 # Tyler Windes Portfolio - Three Project Site
 
 Source for [tyler-windes.com](https://tyler-windes.com/), a static site that brings three related work samples into one consistent project path.
