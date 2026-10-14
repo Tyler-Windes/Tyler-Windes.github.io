@@ -227,6 +227,8 @@ em{font-family:var(--display);font-weight:400}
   .hero-aside{display:none}
   .featured,.connect-section{color:#000;background:#fff}
   .feature-copy p,.connect-grid p:not(.overline){color:#000}
+  .featured .feature-copy,.featured .feature-copy *,
+  .connect-section,.connect-section *{color:#000!important}
 }
 
 .hero::after{display:none}

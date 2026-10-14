@@ -806,6 +806,10 @@ dd {
   gap: 1.25rem;
 }
 
+.project-hero-inner > * {
+  min-width: 0;
+}
+
 .breadcrumb {
   width: fit-content;
   font-size: var(--step--1);
@@ -814,6 +818,11 @@ dd {
 
 .project-hero h1 {
   margin-bottom: 0.5rem;
+}
+
+.project-hero h1,
+.case-section h2 {
+  overflow-wrap: anywhere;
 }
 
 .project-facts {

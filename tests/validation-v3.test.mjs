@@ -115,3 +115,109 @@ test('portable gate accepts current content and rejects real defects with fresh 
     });
   }
 });
+
+// Optional browser-backed regressions: set PORTFOLIO_BROWSER_EXECUTABLE to an
+// installed Chromium-family executable. Node built-ins only; no installation.
+// The existing validator suite above always runs, including when Chrome is absent.
+test('rendered print and reader-spacing regressions', {
+  skip: !process.env.PORTFOLIO_BROWSER_EXECUTABLE && 'Set PORTFOLIO_BROWSER_EXECUTABLE for rendered CSS checks',
+}, async t => {
+  const { spawn } = await import('node:child_process');
+  const { pathToFileURL } = await import('node:url');
+  const root = copy('browser-regressions');
+  assert.equal(command(root, 'build').status, 0, 'Build real site for browser checks');
+  const profile = mkdtempSync(join(run, 'chrome-'));
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const proc = spawn(process.env.PORTFOLIO_BROWSER_EXECUTABLE, [
+    '--headless=new', '--no-first-run', '--no-default-browser-check',
+    '--disable-extensions', '--disable-background-networking', '--disable-sync',
+    '--disable-component-update', '--remote-debugging-address=127.0.0.1',
+    '--remote-debugging-port=0', '--user-data-dir=' + profile, 'about:blank',
+  ], { stdio: 'ignore', windowsHide: true });
+  let exited = false; proc.once('exit', () => { exited = true; });
+  let ws, sequence = 0; const pending = new Map(), observations = [];
+  const send = (method, params = {}) => new Promise((resolve, reject) => {
+    const id = ++sequence, timer = setTimeout(() => { pending.delete(id); reject(Error('CDP timeout ' + method)); }, 10000);
+    pending.set(id, { resolve: v => { clearTimeout(timer); resolve(v); }, reject: e => { clearTimeout(timer); reject(e); } });
+    ws.send(JSON.stringify({ id, method, params }));
+  });
+  const evaluate = async expression => {
+    const r = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+    assert.ok(!r.exceptionDetails, JSON.stringify(r.exceptionDetails)); return r.result.value;
+  };
+  const page = async (relative, width, media = 'screen') => {
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await send('Emulation.setEmulatedMedia', { media });
+    const url = pathToFileURL(join(root, 'dist', relative)).href;
+    await send('Page.navigate', { url });
+    for (let i = 0; i < 80; i++) {
+      await sleep(50);
+      if (await evaluate('location.href === ' + JSON.stringify(url) + ' && document.readyState === "complete" && !!document.querySelector("main")')) {
+        await evaluate('document.fonts.ready.then(() => true)'); return;
+      }
+    }
+    assert.fail('Page did not load: ' + relative);
+  };
+  const recordBrowser = async (id, details) => {
+    const screenshot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+    writeFileSync(join(evidence, id + '.png'), Buffer.from(screenshot.data, 'base64'));
+    observations.push({ id, ...details });
+    writeFileSync(join(evidence, 'browser-regressions.json'), JSON.stringify(observations, null, 2) + '\n');
+  };
+  try {
+    let port;
+    for (let i = 0; i < 100; i++) {
+      const active = join(profile, 'DevToolsActivePort');
+      if (existsSync(active)) { port = Number(readFileSync(active, 'utf8').split('\n')[0]); break; }
+      assert.ok(!exited, 'Chrome exited before initialization'); await sleep(50);
+    }
+    assert.ok(port, 'Chrome debugging endpoint available');
+    const tabs = await (await fetch('http://127.0.0.1:' + port + '/json/list')).json();
+    ws = new WebSocket(tabs.find(x => x.type === 'page').webSocketDebuggerUrl);
+    await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, { once: true }); ws.addEventListener('error', reject, { once: true }); });
+    ws.addEventListener('message', e => { const m = JSON.parse(e.data), p = pending.get(m.id); if (!p) return; pending.delete(m.id); m.error ? p.reject(Error(JSON.stringify(m.error))) : p.resolve(m.result || {}); });
+    await send('Page.enable'); await send('Runtime.enable');
+    await t.test('F-01 important homepage copy and links remain readable in print', async () => {
+      await page('index.html', 1280, 'print');
+      const details = await evaluate(`(() => {
+        const rgb = s => s.match(/[\\d.]+/g).slice(0,3).map(Number);
+        const lum = a => a.map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4).reduce((sum,v,i) => sum+v*[.2126,.7152,.0722][i],0);
+        const rows = [];
+        for (const e of document.querySelectorAll('.featured .feature-copy *, .connect-section *')) {
+          const text = [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').trim();
+          if (!text || !e.getClientRects().length) continue;
+          const s = getComputedStyle(e); let background = [255,255,255];
+          for (let p=e;p;p=p.parentElement) { const b=getComputedStyle(p).backgroundColor, v=b.match(/[\\d.]+/g); if(v && (v.length===3 || +v[3]===1)) { background=rgb(b);break; } }
+          const a=lum(rgb(s.color)),b=lum(background),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+          const required=parseFloat(s.fontSize)>=24 || (parseFloat(s.fontSize)>=18.66 && parseFloat(s.fontWeight)>=700) ? 3 : 4.5;
+          rows.push({text,ratio,required});
+        }
+        return {rows, failing:rows.filter(r => r.ratio<r.required)};
+      })()`);
+      await recordBrowser('F-01', details);
+      assert.ok(details.rows.length >= 12, 'Print probe must cover actual feature/contact text');
+      assert.deepEqual(details.failing, [], 'F-01: important print text lacks contrast');
+    });
+    for (const [name, relative] of [['irw', 'irw/index.html'], ['integration', 'projects/saas-integration-reliability-support-troubleshooting.html']]) {
+      for (const width of [320, 390]) await t.test('F-02 ' + name + ' readable spacing at ' + width, async () => {
+        await page(relative, width);
+        const details = await evaluate(`(() => {
+          const s=document.createElement('style');s.textContent='*{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}p{margin-bottom:2em!important}';document.head.append(s);
+          const h=document.querySelector('.project-hero h1'),r=h.getBoundingClientRect();
+          return {client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,heading:h.textContent.trim(),left:r.left,right:r.right,headingOverflow:getComputedStyle(h).overflowX};
+        })()`);
+        await recordBrowser('F-02-' + name + '-' + width, details);
+        assert.ok(details.scroll <= details.client + 1, 'F-02: horizontal overflow ' + JSON.stringify(details));
+        assert.ok(details.left >= -1 && details.right <= details.client + 1, 'Heading must remain in the content viewport');
+        assert.ok(!['hidden', 'clip'].includes(details.headingOverflow), 'Do not conceal heading text');
+      });
+    }
+  } finally {
+    try { await send('Browser.close'); } catch {}
+    try { ws?.close(); } catch {}
+    for (let i=0;i<30&&!exited;i++) await sleep(100);
+    if (!exited) { proc.kill(); for(let i=0;i<30&&!exited;i++) await sleep(100); }
+    writeFileSync(join(evidence, 'browser-settlement.json'), JSON.stringify({pid:proc.pid,exited,exit_code:proc.exitCode,signal:proc.signalCode})+'\n');
+    assert.ok(exited, 'Owned Chrome process must exit');
+  }
+});

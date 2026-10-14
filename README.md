@@ -1,12 +1,6 @@
-# Production-format website CANDIDATE - not published
-
-Private staging source composed from existing clean public checkout and Owner-approved polished copy. Current project/site authorities remain unchanged. Build/test only inside this folder. No remote actions, deployment, social-media update, public claim release or external services are authorized. The full prior README remains below for provenance.
-
----
-
 # Tyler Windes Portfolio - Three Project Site
 
-Source for [tyler-windes.com](https://tyler-windes.com/), a static site that brings three related work samples into one consistent project path.
+Source for [tyler-windes.com](https://tyler-windes.com/), a published static portfolio that brings three related work samples into one consistent project path.
 
 The site presents:
 
@@ -14,7 +8,7 @@ The site presents:
 - **Implementation Readiness and Support Transition** - a platform-neutral foundation connected to the IRW Jira and Confluence implementation, including requirements, UAT, Bug correction, readiness, rollback, and handoff
 - **SaaS Integration Reliability and Support Troubleshooting** - local API contracts, mapping, idempotency, retry, dead letter, replay, reconciliation, and troubleshooting
 
-All project data and scenarios are fictional. The site does not claim customer work, production deployment, measured outcomes, or tools that were not actually implemented and tested.
+The technical work samples use fictional or synthetic data and scenarios. Amkha Seed LLC is real business experience, separate from these technical demonstrations. The samples do not claim customer implementations, production deployments, or measured customer outcomes; their stated results are bounded by the documented tests.
 
 ## Canonical project routes
 
@@ -39,8 +33,11 @@ Node.js 24.18.1 is the reviewed runtime. The site has no package dependencies, c
 ```text
 npm run build
 npm run validate
+npm test
 npm run dev
 ```
+
+Before running `npm test`, set `PORTFOLIO_TEST_ROOT` to an isolated copy of the current site inputs, `PORTFOLIO_FIXTURE_ROOT` to a separate scratch directory, and `PORTFOLIO_TEST_EVIDENCE` to a test-output directory. The suite builds fixtures and records actual validator results. To also run the print and text-spacing browser regressions, set `PORTFOLIO_BROWSER_EXECUTABLE` to an installed Chromium-family browser; those browser checks are explicitly skipped when it is absent. No browser or package is installed by the tests.
 
 The build copies committed static source and assets to `dist`, resolves `{{SITE_BASE_URL}}` from `content/site/site-config.json`, generates `robots.txt` and `sitemap.xml`, and writes a deterministic manifest to `validation/build-manifest.json`.
 
@@ -76,7 +73,7 @@ The IRW core v1.0 work is complete. The next phase contains:
 - Jira saved filters and a small status dashboard
 - A read-only Forge readiness component
 
-The Forge design is complete, and the certification path and hands-on preparation are in progress. No Forge source, app identity, build, deployment, installation, or runtime result is claimed yet.
+The Atlassian Credentialed in Forge Fundamentals certificate is earned; the planned Forge component is not implemented or deployed. The Forge design is complete. No Forge source, app identity, build, deployment, installation, or runtime result is claimed yet.
 
 ## Scope
 
