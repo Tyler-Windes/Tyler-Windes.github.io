@@ -221,3 +221,161 @@ test('rendered print and reader-spacing regressions', {
     assert.ok(exited, 'Owned Chrome process must exit');
   }
 });
+
+// F-03: a real HTTP 404 must retain origin-root assets and working recovery.
+// Restoring relative hrefs breaks nested URLs; changing only recovery hrefs
+// must fail even when CSS and favicon still work. Node built-ins + installed
+// Chrome only; fixture/evidence/profile locations come from the caller.
+test('F-03 HTTP-backed missing-page assets and recovery', {
+  skip: !process.env.PORTFOLIO_BROWSER_EXECUTABLE && 'Set PORTFOLIO_BROWSER_EXECUTABLE for HTTP browser checks',
+}, async t => {
+  const { createServer } = await import('node:http');
+  const { spawn } = await import('node:child_process');
+  const { createHash } = await import('node:crypto');
+  const { extname, sep } = await import('node:path');
+  const root = copy('http-404-recovery');
+  assert.equal(command(root, 'build').status, 0, 'Build the actual source');
+  const dist = join(root, 'dist'), current404 = readFileSync(join(dist, '404.html'), 'utf8');
+  const rootReferences = ['assets/favicon.svg', 'styles.css', 'index.html', 'projects/workflow-intake-analysis.html'];
+  let rooted404 = current404;
+  for (const ref of rootReferences) rooted404 = rooted404.replaceAll('href="' + ref + '"', 'href="/' + ref + '"');
+  const legacy404 = rootReferences.reduce((s, ref) => s.replaceAll('href="/' + ref + '"', 'href="' + ref + '"'), rooted404);
+  const recovery404 = ['index.html', 'projects/workflow-intake-analysis.html'].reduce((s, ref) => s.replaceAll('href="/' + ref + '"', 'href="' + ref + '"'), rooted404);
+  let fixture = 'current';
+  const bodies = { current: current404, legacy: legacy404, recovery: recovery404 };
+  const requests = [], observations = [], events = [];
+  const digest = b => createHash('sha256').update(b).digest('hex');
+  const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.txt': 'text/plain', '.xml': 'application/xml' };
+  const server = createServer((req, res) => {
+    const pathname = decodeURIComponent(new URL(req.url, 'http://fixture.invalid').pathname);
+    const relative = pathname.endsWith('/') ? pathname + 'index.html' : pathname;
+    const file = resolve(dist, '.' + relative);
+    const present = file.startsWith(dist + sep) && existsSync(file);
+    const status = present ? 200 : 404;
+    const body = present ? readFileSync(file) : Buffer.from(bodies[fixture]);
+    const mime = present ? types[extname(file)] || 'application/octet-stream' : types['.html'];
+    requests.push({ fixture, path: pathname, status, mime, bytes: body.length, sha256: digest(body) });
+    res.writeHead(status, { 'Content-Type': mime, 'Cache-Control': 'no-store' }); res.end(body);
+  });
+  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+  const origin = 'http://127.0.0.1:' + server.address().port;
+  const profile = mkdtempSync(join(run, 'chrome-http404-'));
+  const proc = spawn(process.env.PORTFOLIO_BROWSER_EXECUTABLE, [
+    '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-extensions',
+    '--disable-background-networking', '--disable-sync', '--disable-component-update',
+    '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0', '--user-data-dir=' + profile, 'about:blank',
+  ], { stdio: 'ignore', windowsHide: true });
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let exited = false, ws, sequence = 0; proc.once('exit', () => { exited = true; });
+  const pending = new Map();
+  const send = (method, params = {}) => new Promise((resolve, reject) => {
+    const id = ++sequence, timer = setTimeout(() => { pending.delete(id); reject(Error('F03_CDP_TIMEOUT ' + method)); }, 10000);
+    pending.set(id, { resolve: value => { clearTimeout(timer); resolve(value); }, reject: e => { clearTimeout(timer); reject(e); } });
+    ws.send(JSON.stringify({ id, method, params }));
+  });
+  const evaluate = async expression => {
+    const r = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+    assert.ok(!r.exceptionDetails, 'F03_RUNTIME ' + JSON.stringify(r.exceptionDetails)); return r.result.value;
+  };
+  const navigate = async url => {
+    await send('Page.navigate', { url });
+    for (let i = 0; i < 100; i++) {
+      await sleep(40);
+      if (await evaluate('location.href===' + JSON.stringify(url) + '&&document.readyState==="complete"&&!!document.querySelector("main")')) {
+        await evaluate('document.fonts.ready.then(()=>true)'); return;
+      }
+    }
+    assert.fail('F03_PAGE_TIMEOUT ' + url);
+  };
+  async function probe(id, route, width, mode) {
+    fixture = mode;
+    const start = requests.length, eventStart = events.length, checks = [];
+    const check = (id, passed, detail) => checks.push({ id, passed: !!passed, detail });
+    const url = origin + route;
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+    await navigate(url);
+    const details = await evaluate(`(async()=>{
+      const asset=async selector=>{const e=document.querySelector(selector),r=await fetch(e.href,{cache:'no-store'}),b=await r.arrayBuffer();return {url:e.href,status:r.status,mime:r.headers.get('content-type'),bytes:b.byteLength,sha256:[...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(v=>v.toString(16).padStart(2,'0')).join('')}};
+      const sheet=document.querySelector('link[rel=stylesheet]');
+      return {heading:document.querySelector('h1').textContent.trim(),css:await asset('link[rel=stylesheet]'),icon:await asset('link[rel=icon]'),stylesheetLoaded:[...document.styleSheets].some(s=>{try{return s.href===sheet.href&&s.cssRules.length>0}catch{return false}}),margin:getComputedStyle(document.body).margin,brandBackground:getComputedStyle(document.querySelector('.brand-mark')).backgroundColor,client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,links:[...document.querySelectorAll('.brand,.button-primary,.button-secondary')].map(a=>({selector:a.classList.contains('brand')?'.brand':a.classList.contains('button-primary')?'.button-primary':'.button-secondary',url:a.href}))};
+    })()`);
+    check('F03_CUSTOM_404_DOCUMENT', events.slice(eventStart).some(e => e.method === 'Network.responseReceived' && e.params.type === 'Document' && e.params.response.url === url && e.params.response.status === 404) && details.heading === 'This route does not lead to a portfolio page.', details.heading);
+    check('F03_CSS_ORIGIN_ROOT', details.css.url === origin + '/styles.css', details.css);
+    check('F03_CSS_RESPONSE', details.css.status === 200 && details.css.mime.startsWith('text/css') && details.css.sha256 === digest(readFileSync(join(dist, 'styles.css'))), details.css);
+    check('F03_ICON_ORIGIN_ROOT', details.icon.url === origin + '/assets/favicon.svg', details.icon);
+    check('F03_ICON_RESPONSE', details.icon.status === 200 && details.icon.mime.startsWith('image/svg+xml') && details.icon.sha256 === digest(readFileSync(join(dist, 'assets/favicon.svg'))), details.icon);
+    check('F03_COMPUTED_STYLING', details.stylesheetLoaded && details.margin === '0px' && details.brandBackground === 'rgb(23, 63, 54)', { loaded: details.stylesheetLoaded, margin: details.margin, brandBackground: details.brandBackground });
+    check('F03_VIEWPORT', details.scroll <= details.client + 1, { client: details.client, scroll: details.scroll });
+    const navigations = [];
+    for (const [selector, path, heading, name] of [
+      ['.button-primary', '/index.html', 'I turn complex information', 'PRIMARY'],
+      ['.button-secondary', '/projects/workflow-intake-analysis.html', 'Workflow Intake Analysis Demo', 'SECONDARY'],
+      ['.brand', '/index.html', 'I turn complex information', 'BRAND'],
+    ]) {
+      await navigate(url);
+      const target = details.links.find(x => x.selector === selector).url;
+      check('F03_' + name + '_TARGET', target === origin + path, target);
+      const requestStart = requests.length;
+      await evaluate('document.querySelector(' + JSON.stringify(selector) + ').click()');
+      for (let i = 0; i < 100; i++) { await sleep(40); if (await evaluate('location.href===' + JSON.stringify(target) + '&&document.readyState==="complete"')) break; }
+      const actual = await evaluate('({url:location.href,heading:document.querySelector("h1")?.textContent.replace(/\\s+/g," ").trim()})');
+      const responses = requests.slice(requestStart).filter(x => x.path === new URL(target).pathname);
+      check('F03_' + name + '_NAVIGATION', actual.url === origin + path && actual.heading?.includes(heading) && responses.some(x => x.status === 200 && x.mime.startsWith('text/html')), { target, actual, responses });
+      navigations.push({ name, target, ...actual, responses });
+    }
+    const actualRequests = requests.slice(start);
+    const unexpected = actualRequests.filter(r => r.status >= 400 && r.path !== route);
+    const browserResponses = events.slice(eventStart).filter(e => e.method === 'Network.responseReceived');
+    const unexpectedResponses = browserResponses.filter(e => e.params.response.status >= 400 && !(e.params.type === 'Document' && e.params.response.url === url && e.params.response.status === 404));
+    const expected404Ids = new Set(browserResponses.filter(e => e.params.type === 'Document' && e.params.response.url === url && e.params.response.status === 404).map(e => e.params.requestId));
+    const unexpectedLogErrors = events.slice(eventStart).filter(e => e.method === 'Log.entryAdded' && e.params.entry.level === 'error' && !expected404Ids.has(e.params.entry.networkRequestId));
+    const loadingErrors = events.slice(eventStart).filter(e => e.method === 'Network.loadingFailed' && !(e.params.type === 'Document' && e.params.canceled));
+    const runtime = events.slice(eventStart).filter(e => e.method === 'Runtime.exceptionThrown');
+    check('F03_NO_UNEXPECTED_HTTP_ERRORS', unexpected.length === 0 && unexpectedResponses.length === 0 && unexpectedLogErrors.length === 0 && loadingErrors.length === 0, { unexpected, unexpectedResponses, unexpectedLogErrors, loadingErrors });
+    check('F03_NO_RUNTIME_EXCEPTION', runtime.length === 0, runtime);
+    const screenshot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+    writeFileSync(join(evidence, id + '.png'), Buffer.from(screenshot.data, 'base64'));
+    const row = { id, mode, route, width, utc: new Date().toISOString(), checks, failed_check_ids: checks.filter(c => !c.passed).map(c => c.id), details, navigations, requests: actualRequests, events: events.slice(eventStart) };
+    observations.push(row);
+    writeFileSync(join(evidence, 'f03-http-recovery.json'), JSON.stringify(observations, null, 2) + '\n');
+    return row;
+  }
+  try {
+    let port;
+    for (let i = 0; i < 100; i++) {
+      const active = join(profile, 'DevToolsActivePort');
+      if (existsSync(active)) { try { port = Number(readFileSync(active, 'utf8').split('\n')[0]); if (port) break; } catch (e) { if (e.code !== 'EBUSY') throw e; } }
+      assert.ok(!exited, 'F03_CHROME_STARTUP'); await sleep(80);
+    }
+    assert.ok(port, 'F03_CHROME_ENDPOINT');
+    const tabs = await (await fetch('http://127.0.0.1:' + port + '/json/list')).json();
+    ws = new WebSocket(tabs.find(x => x.type === 'page').webSocketDebuggerUrl);
+    await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, { once: true }); ws.addEventListener('error', reject, { once: true }); });
+    ws.addEventListener('message', e => { const m = JSON.parse(e.data), p = pending.get(m.id); if (p) { pending.delete(m.id); m.error ? p.reject(Error(JSON.stringify(m.error))) : p.resolve(m.result || {}); } else if (['Runtime.exceptionThrown', 'Network.responseReceived', 'Network.loadingFailed', 'Log.entryAdded'].includes(m.method)) events.push(m); });
+    await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable'); await send('Network.setCacheDisabled', { cacheDisabled: true }); await send('Log.enable');
+    for (const [name, route] of [['root', '/missing-document'], ['nested', '/nested/missing-document'], ['trailing', '/nested/missing-directory/']]) {
+      for (const width of [1440, 390]) await t.test('F03 current ' + name + ' ' + width, async () => {
+        const r = await probe('F03-current-' + name + '-' + width, route, width, 'current');
+        assert.deepEqual(r.failed_check_ids, [], 'F03 actual HTTP 404 recovery failed: ' + r.failed_check_ids.join(','));
+      });
+    }
+    await t.test('F03 rejects old relative-reference fixture', async () => {
+      const r = await probe('F03-legacy-relative', '/nested/missing-directory/', 390, 'legacy');
+      assert.ok(r.failed_check_ids.includes('F03_CSS_ORIGIN_ROOT'), 'Old asset URLs must fail');
+      assert.ok(r.failed_check_ids.includes('F03_PRIMARY_TARGET') && r.failed_check_ids.includes('F03_SECONDARY_TARGET'), 'Old recovery URLs must fail');
+    });
+    await t.test('F03 rejects recovery-only relative mutant with working CSS', async () => {
+      const r = await probe('F03-recovery-relative', '/nested/missing-directory/', 390, 'recovery');
+      assert.ok(r.checks.find(c => c.id === 'F03_COMPUTED_STYLING').passed && r.checks.find(c => c.id === 'F03_CSS_RESPONSE').passed, 'Mutant must have real working CSS');
+      assert.ok(r.failed_check_ids.includes('F03_PRIMARY_NAVIGATION') && r.failed_check_ids.includes('F03_SECONDARY_NAVIGATION'), 'Working styling cannot hide broken recovery navigation');
+    });
+  } finally {
+    try { await send('Browser.close'); } catch {}
+    try { ws?.close(); } catch {}
+    for (let i = 0; i < 30 && !exited; i++) await sleep(100);
+    if (!exited) { proc.kill(); for (let i = 0; i < 30 && !exited; i++) await sleep(100); }
+    server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
+    writeFileSync(join(evidence, 'f03-settlement.json'), JSON.stringify({ pid: proc.pid, exited, server_closed: !server.listening, origin, observations: observations.length, source_fixture: root }) + '\n');
+    assert.ok(exited && !server.listening, 'F03 owned browser and HTTP fixture server must close');
+  }
+});
