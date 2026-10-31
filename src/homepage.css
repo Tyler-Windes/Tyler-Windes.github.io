@@ -230,12 +230,18 @@ em{font-family:var(--display);font-weight:400}
   .featured .feature-copy,.featured .feature-copy *,
   .connect-section,.connect-section *{color:#000!important}
 }
-
-.hero::after{display:none}
-
-/* PRIVATE DESIGN CONTRAST CORRECTION: readable featured project heading on dark background */
-.featured .feature-copy h3 { color: #ffffff; }
-.featured .feature-copy h3 em { color: #c9dfce; }
+
+
+.hero::after{display:none}
+
+
+
+/* PRIVATE DESIGN CONTRAST CORRECTION: readable featured project heading on dark background */
+
+.featured .feature-copy h3 { color: #ffffff; }
+
+.featured .feature-copy h3 em { color: #c9dfce; }
+
 
 /* Bounded final polish — retain accepted visual language, improve touch access and evidence links. */
 .top nav a { display: inline-flex; align-items: center; min-height: 28px; }
@@ -259,3 +265,13 @@ em{font-family:var(--display);font-weight:400}
 .incident-events .arrow { color: #705034; }
 .incident-end span { color: #48614f; }
 .text-action, .footer-grid a { display: inline-flex; align-items: center; min-height: 28px; }
+
+/* Independent experience addition; existing project structure and visual system retained. */
+.independent-section{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-top:66px;padding-bottom:58px;border-bottom:1px solid var(--line)}
+.independent-intro h2{font-size:42px;max-width:16ch;margin-bottom:22px}
+.independent-detail ul{margin:0 0 22px;padding-left:21px}
+.independent-detail li{margin-bottom:16px}
+.independent-context,.independent-proof{font-size:14px;color:var(--muted)}
+@media(max-width:900px){.independent-section{grid-template-columns:1fr;gap:22px}.independent-intro h2{max-width:24ch}}
+@media(max-width:760px){.independent-section{padding-top:38px;padding-bottom:35px}.independent-intro h2{font-size:35px}}
+@media print{.independent-section{display:block;padding-top:20px;padding-bottom:20px}.independent-intro h2{font-size:24px;max-width:none}.independent-detail li{break-inside:avoid}.independent-context,.independent-proof{color:#000}}
