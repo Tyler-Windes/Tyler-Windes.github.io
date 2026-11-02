@@ -19,7 +19,7 @@ const REPOSITORIES = [
 const CASES = ['irw/index.html', 'projects/workflow-intake-analysis.html', 'projects/saas-integration-reliability-support-troubleshooting.html'];
 const HTML = ['index.html', ...CASES, 'projects/implementation-readiness-support-transition.html', '404.html'];
 const STATIC = ['.nojekyll', ...HTML, 'assets/favicon.svg', 'assets/irw-social-preview.png',
-  'assets/social-preview-1200x630.png', 'homepage.css', 'styles.css', 'robots.txt', 'sitemap.xml'].sort();
+  'assets/social-preview-1200x630.png', 'assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf', 'homepage.css', 'styles.css', 'robots.txt', 'sitemap.xml'].sort();
 export const replacements = Object.freeze({
   ASCII_DASHES_ON_REFRESHED_SURFACES: 'V3_UTF8_TEXT_INTEGRITY',
   STATIC_SOURCE_SET: 'V3_STATIC_SOURCE_SET',
@@ -29,6 +29,7 @@ export const replacements = Object.freeze({
   PAGE_ACCESSIBILITY_INDEX_HTML: 'V3_HOME_ACCESSIBILITY',
   HOME_THREE_PROJECTS: 'V3_THREE_PROJECTS',
   IRW_SCOPE_BOUNDARY: 'V3_IRW_SCOPE',
+  IRW_ATLASSIAN_SIGN_IN_LABEL: 'V3_IRW_COMPANION_ACCESS',
   HOME_IRW_CANONICAL_LINK: 'V3_CANONICAL_CASE_LINKS',
   PROJECT_NAVIGATION: 'V3_PRIMARY_NAVIGATION',
   LINKS_IRW_INDEX_HTML: 'V3_LINKS_AND_ASSETS',
@@ -116,7 +117,7 @@ export function runPortableValidation() {
       }
       check('V3_LEGACY_COVERAGE', legacy.check_count === 119 && new Set(legacy.checks.map(c => c.id)).size === 119 &&
         Object.keys(replacements).every(key => legacy.checks.some(c => c.id === key)) && legacy.checks.some(c => c.id === 'PACKAGE_WORKFLOW'),
-      '119 fresh legacy results accounted for; thirteen exact layout/navigation replacements and one migrated package binding.');
+      '119 fresh legacy results accounted for; Fourteen exact layout/navigation/access replacements and one migrated package binding; authenticated access remains explicitly labeled.');
     } catch (error) {
       // Missing/malformed inputs must not reuse a previous successful report.
       check('V3_LEGACY_EXECUTION', false, error.message);
@@ -132,13 +133,13 @@ export function runPortableValidation() {
 
     const source = [...files('src').map(p => p.slice(4)), ...files('assets')];
     const built = files('dist').map(p => p.slice(5));
-    check('V3_STATIC_SOURCE_SET', same(source, STATIC), 'Exactly 14 approved files, including homepage.css: ' + JSON.stringify(source));
-    check('V3_BUILD_FILE_SET', same(built, STATIC), 'Exactly the same 14 files in dist: ' + JSON.stringify(built));
+    check('V3_STATIC_SOURCE_SET', same(source, STATIC), 'Exactly 15 approved files, including homepage.css: ' + JSON.stringify(source));
+    check('V3_BUILD_FILE_SET', same(built, STATIC), 'Exactly the same 15 files in dist: ' + JSON.stringify(built));
     const manifest = json('validation/build-manifest.json');
     check('V3_MANIFEST_TOPOLOGY', manifest.schema_version === '1.0.0' &&
       manifest.build_mode === 'DeterministicThreeProjectSiteBaseUrlGeneration' && manifest.site_base_url === ORIGIN &&
       manifest.output_root === 'dist' && same(manifest.source_roots ?? [], ['src', 'assets']) &&
-      manifest.file_count === 14 && same((manifest.entries ?? []).map(e => e.relative_path), STATIC),
+      manifest.file_count === 15 && same((manifest.entries ?? []).map(e => e.relative_path), STATIC),
     'Exact file set/count, no duplicates, authorized origin and deterministic build mode.');
     const entryByPath = new Map((manifest.entries ?? []).map(e => [e.relative_path, e]));
     for (const p of STATIC) {
@@ -154,6 +155,14 @@ export function runPortableValidation() {
       check(`V3_BUILD_HASH_${id(p)}`, present && entry?.size_bytes === output.length && entry?.sha256 === sha(output), `${p}: freshly computed output length and SHA-256.`);
     }
 
+    const companionPath = 'assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf';
+    const companion = existsSync(absolute(companionPath)) ? bytes(companionPath) : Buffer.alloc(0);
+    const pdfSyntax = companion.toString('latin1');
+    check('V3_IRW_PDF_ASSET', companion.subarray(0, 5).toString() === '%PDF-' &&
+      /%%EOF\s*$/.test(pdfSyntax) && (pdfSyntax.match(/\/Type\s*\/Page\b/g) ?? []).length === 7 &&
+      !/\/(?:Encrypt|JavaScript|JS|Launch|EmbeddedFiles|OpenAction|AA)\b/.test(pdfSyntax),
+    'Exact companion asset is a seven-page PDF; known active, encrypted or embedded-file entries are rejected. Exact editorial/source review remains separate.');
+
     const textPaths = [...files('src'), ...files('content'), ...files('dist')].filter(p => /\.(?:html|css|json|txt|xml)$/.test(p));
     const active = textPaths.map(p => text(p)); // fatal UTF-8 decoder
     check('V3_UTF8_TEXT_INTEGRITY', active.every(s => !/[\ufffd\u0000-\u0008\u000b\u000c\u000e-\u001f]|â[€€™“”]/u.test(s)), 'Valid UTF-8, no replacement/control/mojibake characters; Unicode punctuation is allowed.');
@@ -164,6 +173,14 @@ export function runPortableValidation() {
     const meta = (key, attr = 'name') => one(select(home, 'meta'), n => n.attrs[attr] === key)?.attrs.content;
     const title = one(select(home, 'title'), () => true)?.text;
     const alt = 'Tyler Windes - Implementation Readiness Workspace, a synthetic case study';
+    const irwLinks = select(docs.get('irw/index.html'), 'a');
+    check('V3_IRW_COMPANION_ACCESS',
+      !!one(irwLinks, n => n.attrs.href === 'https://tyler-windes.atlassian.net/wiki/external/ZTAyNWZlYmYyYTJiNGUwMzkyNGEyZWY4YmI3NGNhOTM' && n.text.trim() === 'Read the Atlassian case study - no sign-in') &&
+      !!one(irwLinks, n => n.attrs.href === '../assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf' && n.text.trim() === 'Download the case study and selected evidence (PDF)') &&
+      !!one(irwLinks, n => n.attrs.href === 'https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169' && n.text.trim() === 'Open the Atlassian workspace - sign-in required') &&
+      !!one(irwLinks, n => n.attrs.href === REPOSITORIES[0]),
+    'Primary HTML case retains foundation link and distinguishes exact no-login reader, portable PDF and secondary authenticated workspace.');
+
     const png = bytes('dist/assets/irw-social-preview.png');
     check('V3_HOME_METADATA', one(select(home, 'html'), n => n.attrs.lang === 'en') &&
       /Technical Implementation Consultant/.test(title ?? '') && /Business Systems Analyst/.test(title ?? '') &&
@@ -273,7 +290,7 @@ export function runPortableValidation() {
     'New internal links use the direct IRW route while the original legacy redirect remains available.');
 
     const prohibited = [], linkErrors = [];
-    const allowed = new Set([...REPOSITORIES, LINKEDIN, PROFILE, 'https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169',
+    const allowed = new Set([...REPOSITORIES, LINKEDIN, PROFILE, 'https://tyler-windes.atlassian.net/wiki/external/ZTAyNWZlYmYyYTJiNGUwMzkyNGEyZWY4YmI3NGNhOTM', 'https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169',
       "https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/uat-cases-results.csv",
       "https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/defect-retests.csv",
       "https://github.com/Tyler-Windes/workflow-intake-analysis-demo/blob/main/reports/examples/sql/summary_metrics.csv",

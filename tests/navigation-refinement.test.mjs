@@ -31,3 +31,53 @@ test('no literal or encoded em dashes in site HTML or metadata',()=>{for(const p
 test('new cross-case links do not pass through old redirect',()=>{for(const p of pages)assert.ok(anchors(read(p)).every(a=>!a.href?.includes('implementation-readiness-support-transition.html')),p);assert.match(read('projects/implementation-readiness-support-transition.html'),/http-equiv="refresh" content="0; url=\.\.\/irw\/"/);});
 test('approved simpler labels and planned status retained',()=>{assert.match(read('projects/workflow-intake-analysis.html'),/>Scope and limitations<\/h2>/);assert.match(read(pages[3]),/>Local implementation<\/dt>/);assert.match(read('irw/index.html'),/>Planned extensions<\/dt>/);assert.match(read('irw/index.html'),/>Planned reporting and Forge extensions<\/h2>/);assert.match(read('irw/index.html'),/remain planned, not implemented or deployed/);});
 test('approved intro and failure-history wording are exact',()=>{const h=clean(read('index.html'));assert.ok(h.includes('I started building Amkha Seed LLC in 2016. I later managed its customer requests, vendor relationships, inventory, orders and day-to-day operations.'));assert.ok(h.includes('I kept Validation separate from Done and preserved failed tests until the corrections had been retested.'));});
+
+
+// IRW portable companion: public reader, exact static PDF and real preview HTTP.
+test('IRW companion card distinguishes public reader, PDF and authenticated workspace',()=>{
+  const card=/<div class="project-link-list">([\s\S]*?)<\/div>/.exec(read('irw/index.html'))?.[1]??'';
+  const links=anchors(card);
+  assert.ok(links.some(a=>a.href==='https://tyler-windes.atlassian.net/wiki/external/ZTAyNWZlYmYyYTJiNGUwMzkyNGEyZWY4YmI3NGNhOTM'&&a.text==='Read the Atlassian case study - no sign-in'),'IRW_PUBLIC_READER_MISSING');
+  assert.ok(links.some(a=>a.href==='../assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf'&&a.text==='Download the case study and selected evidence (PDF)'),'IRW_PDF_LINK_MISSING');
+  assert.ok(links.some(a=>a.href==='https://github.com/Tyler-Windes/implementation-readiness-support-transition'),'IRW_FOUNDATION_LINK');
+  assert.ok(links.some(a=>a.href==='https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169'&&/workspace.*sign-in required/i.test(a.text)),'IRW_AUTHENTICATED_WORKSPACE_LABEL');
+});
+test('IRW companion is a seven-page static PDF source copied exactly by build',()=>{
+  let pdf;try{pdf=readFileSync(join(root,'assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf'));}catch{assert.fail('IRW_PDF_SOURCE_MISSING');}
+  assert.equal(pdf.subarray(0,5).toString(),'%PDF-','IRW_PDF_MAGIC');
+  assert.match(pdf.subarray(-32).toString(),/%%EOF\s*$/,'IRW_PDF_EOF');
+  assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length,7,'IRW_PDF_SEVEN_PAGES');
+  assert.deepEqual(readFileSync(join(root,'dist/assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf')),pdf,'IRW_PDF_BUILD_PARITY');
+});
+test('IRW PDF preview serves application/pdf with exact bytes and nosniff',async()=>{
+  const {createServer}=await import('node:net');const {spawn}=await import('node:child_process');
+  const reservation=createServer();await new Promise(r=>reservation.listen(0,'127.0.0.1',r));const port=reservation.address().port;await new Promise(r=>reservation.close(r));
+  const proc=spawn(process.execPath,[join(root,'scripts/serve.mjs'),'--root',join(root,'dist'),'--port',String(port)],{stdio:['ignore','pipe','pipe'],windowsHide:true});
+  let stdout='',stderr='';proc.stdout.on('data',b=>{stdout+=b});proc.stderr.on('data',b=>{stderr+=b});let closed=false;proc.once('exit',()=>closed=true);
+  try{
+    for(let i=0;i<100&&!stdout.includes('Local URL:')&&!closed;i++)await new Promise(r=>setTimeout(r,20));
+    assert.ok(stdout.includes('Local URL:'),'IRW_PREVIEW_START '+stderr);
+    const response=await fetch(`http://127.0.0.1:${port}/assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf`);
+    assert.equal(response.status,200,'IRW_PDF_HTTP_STATUS');assert.match(response.headers.get('content-type'),/^application\/pdf(?:;|$)/,'IRW_PDF_HTTP_MIME');
+    assert.equal(response.headers.get('x-content-type-options'),'nosniff');
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()),readFileSync(join(root,'assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf')),'IRW_PDF_HTTP_BYTES');
+  }finally{if(!closed)proc.kill();for(let i=0;i<100&&!closed;i++)await new Promise(r=>setTimeout(r,20));assert.ok(closed,'IRW_OWNED_PREVIEW_CLOSED');}
+});
+
+import {readFileSync as fileRead,writeFileSync as fileWrite} from 'node:fs';
+
+for (const [name, mutate, expected] of [
+  ['missing authenticated label',r=>{const p=join(r,'src/irw/index.html');fileWrite(p,fileRead(p,'utf8').replace('Open the Atlassian workspace - sign-in required','Open the Atlassian workspace'));},'V3_IRW_COMPANION_ACCESS'],
+  ['wrong public reader',r=>{const p=join(r,'src/irw/index.html');fileWrite(p,fileRead(p,'utf8').replace('wiki/external/ZTAyNWZlYmYyYTJiNGUwMzkyNGEyZWY4YmI3NGNhOTM','wiki/external/unapproved-reader'));},'V3_IRW_COMPANION_ACCESS'],
+  ['corrupted PDF bytes',r=>fileWrite(join(r,'assets/documents/IRW_Case_Study_and_Selected_Evidence.pdf'),'not a PDF'),'V3_IRW_PDF_ASSET'],
+]) test('IRW validator rejects '+name,async()=>{
+  const {cpSync,mkdtempSync,mkdirSync}=await import('node:fs');const {spawnSync}=await import('node:child_process');
+  assert.ok(process.env.PORTFOLIO_FIXTURE_ROOT&&process.env.PORTFOLIO_TEST_EVIDENCE,'Isolated D fixture/evidence paths required');
+  mkdirSync(process.env.PORTFOLIO_FIXTURE_ROOT,{recursive:true});const r=mkdtempSync(join(process.env.PORTFOLIO_FIXTURE_ROOT,'irw-'));
+  cpSync(root,r,{recursive:true,filter:p=>!/(?:^|[\\/])(?:dist|validation|node_modules|\.git)(?:[\\/]|$)/.test(p)});
+  mutate(r);const build=spawnSync(process.execPath,['scripts/build.mjs'],{cwd:r,encoding:'utf8',windowsHide:true});assert.equal(build.status,0,build.stderr);
+  const result=spawnSync(process.execPath,['scripts/validate-public-v3.mjs'],{cwd:r,encoding:'utf8',windowsHide:true});
+  const report=JSON.parse(fileRead(join(r,'validation/portable-v3/public-validation.json'),'utf8'));const failed=report.checks.filter(c=>c.result==='FAIL').map(c=>c.id);
+  assert.notEqual(result.status,0,'Invalid companion must fail closed');assert.ok(failed.includes(expected),'Missing rejection '+expected+': '+failed);
+  fileWrite(join(process.env.PORTFOLIO_TEST_EVIDENCE,'irw-'+name.replaceAll(' ','-')+'.json'),JSON.stringify({name,exit_code:result.status,failed_check_ids:failed,run_id:report.run_id,report,stdout:result.stdout,stderr:result.stderr},null,2)+'\n');
+});
