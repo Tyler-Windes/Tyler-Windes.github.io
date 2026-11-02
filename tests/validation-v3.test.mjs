@@ -57,7 +57,7 @@ function record(name, root, outcome, start) {
 const scenarios = [
   ['npm-wrong-canonical', 'npm', r => edit(r, 'src/index.html', 'rel="canonical" href="{{SITE_BASE_URL}}/"', 'rel="canonical" href="{{SITE_BASE_URL}}/wrong/"'), 'V3_HOME_METADATA'],
   ['npm-wrong-social', 'npm', r => edit(r, 'src/index.html', 'property="og:image" content="{{SITE_BASE_URL}}/assets/irw-social-preview.png"', 'property="og:image" content="{{SITE_BASE_URL}}/assets/social-preview-1200x630.png"'), 'V3_HOME_METADATA'],
-  ['description-scope', 'source', r => { const p=join(r,'src/index.html'); writeFileSync(p,readFileSync(p,'utf8').replaceAll('Tyler Windes connects small-business operations','Tyler Windes connects Amkha small-business operations')); }, 'V3_HOME_METADATA'],
+  ['description-scope', 'source', r => { const p=join(r,'src/index.html'); const before=readFileSync(p,'utf8'); assert.ok(before.includes('Tyler Windes designs and builds'),'Description mutation anchor must exist'); writeFileSync(p,before.replaceAll('Tyler Windes designs and builds','Tyler Windes designs and builds Amkha')); }, 'V3_HOME_METADATA'],
   ['extra-source-file', 'source', r => writeFileSync(join(r, 'src/unapproved.txt'), 'unexpected'), 'V3_STATIC_SOURCE_SET'],
   ['missing-source-stylesheet', 'source', r => rmSync(join(r, 'src/homepage.css')), 'V3_STATIC_SOURCE_SET'],
   ['extra-built-file', 'built', r => writeFileSync(join(r, 'dist/unapproved.txt'), 'unexpected'), 'V3_BUILD_FILE_SET'],
