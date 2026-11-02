@@ -27,28 +27,30 @@
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <header class="top">
-    <div class="wrap top-inner">
-      <a class="identity" href="#home" aria-label="Tyler Windes, return to top"><span class="initials" aria-hidden="true">TW</span><span>Tyler Windes</span></a>
-      <nav aria-label="Site navigation">
-        <a href="#work">Work</a>
-        <a href="#background">Background</a>
-        <a href="#approach">Approach</a>
-        <a href="#learning">Learning</a>
-        <a href="#connect">Connect</a>
+  <header class="top navigation-header">
+    <div class="wrap top-inner navigation-inner">
+      <a class="identity" href="index.html" aria-label="Tyler Windes portfolio home"><span class="initials" aria-hidden="true">TW</span><span>Tyler Windes</span></a>
+      <nav class="primary-links" aria-label="Primary navigation">
+        <a href="irw/">Implementation readiness</a>
+        <a href="projects/workflow-intake-analysis.html">Data quality</a>
+        <a href="projects/saas-integration-reliability-support-troubleshooting.html">Integration reliability</a>
+      </nav>
+      <nav class="professional-links" aria-label="Professional links">
+        <a href="https://www.linkedin.com/in/tylerwindes">LinkedIn</a>
+        <a href="https://github.com/Tyler-Windes">GitHub</a>
       </nav>
     </div>
   </header>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <section class="hero wrap" id="home" aria-labelledby="main-heading">
       <div class="hero-inner">
         <p class="overline"><span class="line-mark" aria-hidden="true"></span>Technical implementation · Business systems analysis</p>
         <h1 id="main-heading">I turn complex information into <em>clear requirements and useful workflows.</em></h1>
-        <p class="hero-intro">I started building <strong>Amkha Seed LLC</strong> in 2016 and later ran the practical work behind it—customer requests, vendor relationships, inventory, orders and everyday decisions. That perspective now informs how I approach technical requirements, data quality, implementation readiness and useful handoffs.</p>
+        <p class="hero-intro">I started building <strong>Amkha Seed LLC</strong> in 2016. I later managed its customer requests, vendor relationships, inventory, orders and day-to-day operations. That experience shapes how I approach requirements, data quality, implementation readiness and useful handoffs.</p>
         <div class="hero-actions">
-          <a class="button primary" href="#work">Explore selected work <span aria-hidden="true">↗</span></a>
-          <a class="text-action" href="https://www.linkedin.com/in/tylerwindes">Find me on LinkedIn <span aria-hidden="true">↗</span></a>
+          <a class="button primary" href="irw/">Read the implementation-readiness case <span aria-hidden="true">→</span></a>
+          <a class="text-action" href="#work">Browse all work on this page <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <aside class="hero-aside" aria-label="Professional focus">
@@ -58,6 +60,18 @@
         <div class="aside-footer"><span>Business context</span><span class="connector-line" aria-hidden="true"></span><span>Technical clarity</span></div>
       </aside>
     </section>
+
+    <nav class="home-toc wrap" aria-label="On this page">
+      <p class="toc-label">On this page</p>
+      <ul>
+        <li><a href="#background">Background</a></li>
+        <li><a href="#independent-work">Independent work</a></li>
+        <li><a href="#work">Selected work</a></li>
+        <li><a href="#approach">Approach</a></li>
+        <li><a href="#learning">Learning</a></li>
+        <li><a href="#connect">Connect</a></li>
+      </ul>
+    </nav>
 
     <section class="experience-band" id="background" aria-labelledby="background-heading">
       <div class="wrap experience-grid">
@@ -100,11 +114,16 @@
       <article class="featured" aria-labelledby="featured-title">
         <div class="feature-copy">
           <div class="feature-topline"><span>01 / FEATURED CASE</span><span>Fictional implementation exercise</span></div>
+          <p class="case-name"><a href="irw/">Implementation Readiness Workspace</a></p>
           <h3 id="featured-title">“Done” isn't the same as <em>ready to hand over.</em></h3>
           <p class="feature-lead">A service-request process can look complete while responsibility, acceptance and support handoff are still unclear. I modeled the path from intake and requirements through Jira/Confluence workflows, testing, corrections and readiness.</p>
-          <p>The important choice was to keep <strong>Validation separate from Done</strong>—and keep failed tests visible until the corrections had actually been retested.</p>
+          <p>I kept <strong>Validation separate from Done</strong> and preserved failed tests until the corrections had been retested.</p>
           <div class="small-tags"><span>Requirements</span><span>Jira &amp; Confluence</span><span>UAT / retest</span><span>Support handoff</span></div>
-          <a class="dark-link" href="irw/index.html">Read the implementation-readiness case <span aria-hidden="true">↗</span></a>
+          
+        <div class="case-actions feature-actions">
+            <a class="case-primary" href="irw/">Read implementation case <span aria-hidden="true">→</span></a>
+            <a class="case-source" href="https://github.com/Tyler-Windes/implementation-readiness-support-transition">View foundation evidence on GitHub <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
         <figure class="feature-visual" aria-labelledby="visual-title">
           <div class="visual-top"><span class="visual-kicker">IMPLEMENTATION READINESS</span><span class="visual-counter">MODEL / 02</span></div>
@@ -114,15 +133,20 @@
           <div class="visual-step"><b class="step-id">03</b><div><strong>Correct and retest</strong><small>Keep earlier failures in the evidence history.</small></div><span class="step-dot"></span></div>
           <div class="visual-step"><b class="step-id">04</b><div><strong>Decide readiness</strong><small>Ownership, rollback and support transition.</small></div><span class="step-dot final"></span></div>
           <div class="visual-stats"><div><strong>10</strong><span>final passing fictional IRW UAT cases</span></div><div><strong>8</strong><span>separate synthetic foundation cases</span></div></div>
-          <figcaption>Editorial illustration of the work-sample lifecycle, <strong>not a Jira screenshot</strong>. The ten-case fictional Atlassian layer and eight-case foundation are separate evidence sets.<br><a class="proof-link" href="https://github.com/Tyler-Windes/implementation-readiness-support-transition">Inspect the foundation source and evidence ↗</a></figcaption>
+          <figcaption>Editorial illustration of the work-sample lifecycle, <strong>not a Jira screenshot</strong>. The ten-case fictional Atlassian layer and eight-case foundation are separate evidence sets.</figcaption>
         </figure>
       </article>
 
       <div class="project-pair">
         <article class="case data-case" aria-labelledby="data-title">
           <div class="case-head"><span>02 / DATA QUALITY</span><span>Synthetic local work sample</span></div>
+          <p class="case-name"><a href="projects/workflow-intake-analysis.html">Workflow Intake Analysis</a></p>
           <h3 id="data-title">An unknown value <em>isn't a “yes.”</em></h3>
           <p>In an intake-analysis demo, I chose to preserve uncertainty rather than turn a missing answer into a convenient assumption. Rules separated validated records from the ones that still needed review.</p>
+          <div class="case-actions">
+            <a class="case-primary" href="projects/workflow-intake-analysis.html">Read data-quality case <span aria-hidden="true">→</span></a>
+            <a class="case-source" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo">View validation evidence on GitHub <span aria-hidden="true">↗</span></a>
+          </div>
           <figure class="data-visual">
             <p class="visual-kicker">WHAT THE MODEL DID WITH 30 SYNTHETIC RECORDS</p>
             <div class="data-rows">
@@ -130,24 +154,29 @@
               <div class="data-row"><span class="row-icon review" aria-hidden="true">?</span><span>More context needed</span><strong>9</strong></div>
             </div>
             <div class="unknown-note"><span>Unknown source value</span><span aria-hidden="true">→</span><strong>Review, not an invented fact</strong></div>
-            <figcaption>Editorial summary of synthetic Python/SQL validation outputs, not a screenshot of a customer dataset.<br><a class="proof-link" href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo">Inspect the validation source and evidence ↗</a></figcaption>
+            <figcaption>Editorial summary of synthetic Python/SQL validation outputs, not a screenshot of a customer dataset.</figcaption>
           </figure>
-          <a class="case-link" href="projects/workflow-intake-analysis.html">See the data-quality case <span aria-hidden="true">↗</span></a>
+          
         </article>
 
         <article class="case integration-case" aria-labelledby="integration-title">
           <div class="case-head"><span>03 / INTEGRATION RELIABILITY</span><span>Synthetic local execution</span></div>
+          <p class="case-name"><a href="projects/saas-integration-reliability-support-troubleshooting.html">Integration Reliability</a></p>
           <h3 id="integration-title">A successful API call <em>isn't the finish line.</em></h3>
           <p>I tested what happens when simulated integration events repeat, arrive out of order or fail. The local Python flow records bounded retries, retains failed deliveries and reconciles the final state.</p>
+          <div class="case-actions">
+            <a class="case-primary" href="projects/saas-integration-reliability-support-troubleshooting.html">Read integration case <span aria-hidden="true">→</span></a>
+            <a class="case-source" href="https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting">View integration evidence on GitHub <span aria-hidden="true">↗</span></a>
+          </div>
           <figure class="integration-visual">
             <p class="visual-kicker">ONE FAILURE PATH FROM THE LOCAL TEST SET</p>
             <div class="incident-events">
               <span>503 error</span><span class="arrow" aria-hidden="true">→</span><span>3 attempts</span><span class="arrow" aria-hidden="true">→</span><span>Dead letter</span>
             </div>
             <div class="incident-end"><span>Linked replay after fault clearance</span><strong>3 matching final target records</strong></div>
-            <figcaption>Illustration based on locally executed synthetic scenarios. The suite reported 12/12 expected outcomes; no live SaaS or n8n execution is implied.<br><a class="proof-link" href="https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting">Inspect the local test and reconciliation evidence ↗</a></figcaption>
+            <figcaption>Illustration based on locally executed synthetic scenarios. The suite reported 12/12 expected outcomes; no live SaaS or n8n execution is implied.</figcaption>
           </figure>
-          <a class="case-link" href="projects/saas-integration-reliability-support-troubleshooting.html">Explore the integration case <span aria-hidden="true">↗</span></a>
+          
         </article>
       </div>
     </section>
@@ -166,9 +195,9 @@
     <section class="learning-section wrap" id="learning" aria-labelledby="learning-heading">
       <div class="learning-intro"><div><p class="overline">CONTINUED LEARNING</p><h2 id="learning-heading">Recent proof, <em>in the right context.</em></h2></div><p>These qualifications support the work samples; they don't stand in for customer implementations or production platform ownership.</p></div>
       <div class="credentials">
-        <div><strong>Atlassian</strong><span>Credentialed in Forge Fundamentals; Credentialed in JSM Fundamentals with AI; Credentialed in Rovo Fundamentals — certificates, 2026</span></div>
-        <div><strong>Google Cloud</strong><span>Derive Insights from BigQuery Data Skill Badge — hands-on, September 2026</span></div>
-        <div><strong>Databricks</strong><span>Databricks Fundamentals and Analytics Fundamentals accreditations; SQL Analytics and AI/BI knowledge badges — September 2026</span></div>
+        <div><strong>Atlassian</strong><span>Credentialed in Forge Fundamentals; Credentialed in JSM Fundamentals with AI; Credentialed in Rovo Fundamentals - certificates, 2026</span></div>
+        <div><strong>Google Cloud</strong><span>Derive Insights from BigQuery Data Skill Badge - hands-on, September 2026</span></div>
+        <div><strong>Databricks</strong><span>Databricks Fundamentals and Analytics Fundamentals accreditations; SQL Analytics and AI/BI knowledge badges - September 2026</span></div>
       </div>
       <p class="education-note">Foundation: Associate of Arts with Business Designation, Front Range Community College; University of Denver 240-hour Cybersecurity Boot Camp. Additional CSU and UNC coursework is not represented as degrees.</p>
     </section>

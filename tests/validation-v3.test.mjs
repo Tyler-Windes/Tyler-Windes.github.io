@@ -82,6 +82,12 @@ const scenarios = [
   ['stale-forge-claim', 'source', r => edit(r, 'src/irw/index.html', 'not implemented or deployed', 'implemented and deployed'), 'V3_IRW_SCOPE'],
   ['wrong-package-binding', 'built', r => edit(r, 'package.json', 'npm run build && node scripts/validate-public-v3.mjs', 'node scripts/validate-public.mjs'), 'PACKAGE_WORKFLOW'],
   ['invalid-manifest-json', 'built', r => writeFileSync(join(r, 'validation/build-manifest.json'), '{broken'), 'V3_EXECUTION'],
+  ['navigation-section-jump', 'source', r => edit(r, 'src/index.html', 'href="irw/">Implementation readiness', 'href="#work">Implementation readiness'), 'V3_PRIMARY_NAVIGATION'],
+  ['navigation-wrong-current', 'source', r => edit(r, 'src/irw/index.html', 'aria-current="page"', 'aria-current="step"'), 'V3_PRIMARY_NAVIGATION'],
+  ['artifact-context-confusion', 'source', r => edit(r, 'src/irw/index.html', 'eight-case platform-neutral model', 'ten-case Atlassian test run'), 'V3_ARTIFACT_CONTEXT'],
+  ['artifact-file-removed', 'source', r => edit(r, 'src/projects/workflow-intake-analysis.html', '/blob/main/reports/examples/sql/summary_metrics.csv', '/blob/main/reports/examples/sql/missing.csv'), 'V3_DIRECT_ARTIFACTS'],
+  ['encoded-em-dash', 'source', r => edit(r, 'src/index.html', '</body>', '<p>Unsupported punctuation &mdash; test.</p></body>'), 'V3_NO_EM_DASHES'],
+  ['arbitrary-github-file', 'source', r => edit(r, 'src/index.html', '</body>', '<a href="https://github.com/Tyler-Windes/workflow-intake-analysis-demo/blob/main/unapproved.txt">Unapproved file</a></body>'), 'V3_LINKS_AND_ASSETS'],
 ];
 
 test('portable gate accepts current content and rejects real defects with fresh evidence', async t => {
@@ -105,7 +111,7 @@ test('portable gate accepts current content and rejects real defects with fresh 
   for (const name of ['positive-current', 'positive-legal-unicode']) {
     await t.test(name, () => {
       const root = copy(name);
-      if (name.endsWith('unicode')) edit(root, 'src/index.html', 'The work doesn\'t stop', 'The work doesn\'t stop — really');
+      if (name.endsWith('unicode')) edit(root, 'src/index.html', 'The work doesn\'t stop', 'The work doesn\'t stop - café example');
       assert.equal(command(root, 'build').status, 0);
       const start = Date.now(), outcome = command(root, 'direct');
       const { report, failed } = record(name, root, outcome, start);

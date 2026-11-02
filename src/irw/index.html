@@ -27,20 +27,17 @@
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <header class="site-header">
-    <div class="shell header-inner">
-      <a class="brand" href="../index.html" aria-label="Tyler Windes portfolio home">
-        <span class="brand-mark" aria-hidden="true">TW</span>
-        <span>Tyler Windes</span>
-      </a>
-      <nav aria-label="Project navigation">
-        <ul class="nav-list">
-          <li><a href="#problem">Problem</a></li>
-          <li><a href="#solution">Solution</a></li>
-          <li><a href="#testing">Testing</a></li>
-          <li><a href="#results">Results</a></li>
-          <li><a href="#roadmap">Roadmap</a></li>
-        </ul>
+  <header class="site-header navigation-header">
+    <div class="shell header-inner navigation-inner">
+      <a class="brand" href="../index.html" aria-label="Tyler Windes portfolio home"><span class="brand-mark" aria-hidden="true">TW</span><span>Tyler Windes</span></a>
+      <nav class="primary-links" aria-label="Primary navigation">
+        <a href="../irw/" aria-current="page">Implementation readiness</a>
+        <a href="../projects/workflow-intake-analysis.html">Data quality</a>
+        <a href="../projects/saas-integration-reliability-support-troubleshooting.html">Integration reliability</a>
+      </nav>
+      <nav class="professional-links" aria-label="Professional links">
+        <a href="https://www.linkedin.com/in/tylerwindes">LinkedIn</a>
+        <a href="https://github.com/Tyler-Windes">GitHub</a>
       </nav>
     </div>
   </header>
@@ -52,12 +49,6 @@
         <p class="eyebrow">Requirements - Jira - Confluence - UAT - Support</p>
         <h1 id="project-title">Implementation Readiness Workspace</h1>
         <p class="hero-lead">In a fictional service-request workflow, I made requirements, ownership, testing and handoff decisions visible in Jira and Confluence. Failed tests stayed in the record until corrections were retested.</p>
-        <dl class="project-facts" aria-label="Project facts">
-          <div><dt>Foundation</dt><dd>Platform-neutral lifecycle model</dd></div>
-          <div><dt>Implementation</dt><dd>Jira and Confluence workspace</dd></div>
-          <div><dt>Validation</dt><dd>10 final passing UAT cases</dd></div>
-          <div><dt>Next</dt><dd>Jira reporting and Forge</dd></div>
-        </dl>
         <div class="project-link-card" aria-labelledby="project-links-title">
           <div>
             <p class="project-context">Project records</p>
@@ -68,6 +59,13 @@
               <a class="text-link" href="https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169">View Atlassian case study - sign-in required</a>
             </div>
         </div>
+        <dl class="project-facts" aria-label="Project facts">
+          <div><dt>Foundation</dt><dd>Platform-neutral lifecycle model</dd></div>
+          <div><dt>Implementation</dt><dd>Jira and Confluence workspace</dd></div>
+          <div><dt>Validation</dt><dd>10 final passing UAT cases</dd></div>
+          <div><dt>Planned extensions</dt><dd>Jira reporting and Forge</dd></div>
+        </dl>
+        
       </div>
     </section>
 
@@ -98,7 +96,16 @@
           <p>I then applied the same capability area in a working Jira and Confluence workspace. IRW uses a separate ten-requirement and ten-test model to validate the Atlassian implementation.</p>
           <blockquote class="judgment-call"><p>The original eight validation cases test the platform-neutral model. The ten IRW cases test the Jira and Confluence implementation. I keep the two sets separate because they answer different questions.</p></blockquote>
         </div>
-      </div>
+      
+        <div class="artifact-links" id="foundation-artifacts">
+          <h3>Inspect the platform-neutral foundation</h3>
+          <p>These files document the eight-case platform-neutral model. They are not the test records for the separate ten-case Jira and Confluence implementation.</p>
+          <ul>
+            <li><a href="https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/uat-cases-results.csv">View foundation UAT cases (CSV)</a></li>
+            <li><a href="https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/defect-retests.csv">View foundation defects and retests (CSV)</a></li>
+          </ul>
+        </div>
+</div>
     </section>
 
     <section class="section section-tinted case-section" id="problem" aria-labelledby="problem-title">
@@ -220,7 +227,7 @@
       <div class="shell case-grid">
         <div class="section-heading sticky-heading">
           <p class="eyebrow">v1.1 roadmap</p>
-          <h2 id="roadmap-title">Build a small reporting layer and Forge component next</h2>
+          <h2 id="roadmap-title">Planned reporting and Forge extensions</h2>
         </div>
         <div class="case-copy">
           <p>The first Jira reporting release will create five saved filters and one dashboard covering requirements, open core work, open Bugs, Validation, and the v1.1 roadmap.</p>

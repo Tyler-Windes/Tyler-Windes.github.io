@@ -9,7 +9,7 @@
     "validate": "npm run validate:public",
     "validate:public": "npm run build && node scripts/validate-public-v3.mjs",
     "validate:legacy": "npm run build && node scripts/validate-public.mjs",
-    "test": "node --test tests/ci-entrypoint-v3.test.mjs tests/validation-v3.test.mjs",
+    "test": "node --test tests/ci-entrypoint-v3.test.mjs tests/validation-v3.test.mjs tests/navigation-refinement.test.mjs",
     "validate:publication": "npm run build && node scripts/validate-publication-preflight.mjs",
     "dev": "node scripts/build.mjs && node scripts/serve.mjs --root dist --port 4173",
     "preview": "node scripts/serve.mjs --root dist --port 4173"

@@ -1,5 +1,5 @@
 // Portable successor for the accepted editorial layout. The original evaluator
-// is executed afresh, never loaded from saved JSON. Only the eight enumerated
+// is executed afresh, never loaded from saved JSON. Enumerated layout/navigation
 // assertions are superseded; PACKAGE_WORKFLOW retains its invariant with the
 // new wrapper path. Every other legacy result, including new failures, is kept.
 import { createHash, randomUUID } from 'node:crypto';
@@ -29,6 +29,11 @@ export const replacements = Object.freeze({
   PAGE_ACCESSIBILITY_INDEX_HTML: 'V3_HOME_ACCESSIBILITY',
   HOME_THREE_PROJECTS: 'V3_THREE_PROJECTS',
   IRW_SCOPE_BOUNDARY: 'V3_IRW_SCOPE',
+  HOME_IRW_CANONICAL_LINK: 'V3_CANONICAL_CASE_LINKS',
+  PROJECT_NAVIGATION: 'V3_PRIMARY_NAVIGATION',
+  LINKS_IRW_INDEX_HTML: 'V3_LINKS_AND_ASSETS',
+  LINKS_PROJECTS_WORKFLOW_INTAKE_ANALYSIS_HTML: 'V3_LINKS_AND_ASSETS',
+  LINKS_PROJECTS_SAAS_INTEGRATION_RELIABILITY_SUPPORT_TROUBLESHOOTING_HTML: 'V3_LINKS_AND_ASSETS',
 });
 const absolute = p => join(projectRoot, ...p.split('/'));
 const bytes = p => readFileSync(absolute(p));
@@ -111,7 +116,7 @@ export function runPortableValidation() {
       }
       check('V3_LEGACY_COVERAGE', legacy.check_count === 119 && new Set(legacy.checks.map(c => c.id)).size === 119 &&
         Object.keys(replacements).every(key => legacy.checks.some(c => c.id === key)) && legacy.checks.some(c => c.id === 'PACKAGE_WORKFLOW'),
-      '119 fresh legacy results accounted for; eight exact replacements and one explicitly migrated package binding.');
+      '119 fresh legacy results accounted for; thirteen exact layout/navigation replacements and one migrated package binding.');
     } catch (error) {
       // Missing/malformed inputs must not reuse a previous successful report.
       check('V3_LEGACY_EXECUTION', false, error.message);
@@ -180,14 +185,14 @@ export function runPortableValidation() {
     check('V3_HOME_ACCESSIBILITY', select(home, 'h1').length === 1 && new Set(ids).size === ids.length &&
       one(select(home, 'main'), n => n.attrs.id === 'main') &&
       one(select(home, 'a'), n => hasClass(n, 'skip') && n.attrs.href === '#main' && /^Skip to/i.test(n.text)) &&
-      one(select(home, 'nav'), n => n.attrs['aria-label'] === 'Site navigation'),
+      one(select(home, 'nav'), n => n.attrs['aria-label'] === 'Primary navigation'),
     'One H1, unique IDs, a real skip-to-main target and labeled navigation in the accepted layout.');
     const work = one(select(home, 'section'), n => n.attrs.id === 'work');
     const articles = select(home, 'article').filter(n => under(n, work));
     check('V3_THREE_PROJECTS', articles.length === 3 && hasClass(articles[0], 'featured') &&
       /Fictional implementation exercise/.test(articles[0].text) &&
       articles.every((n, i) => (i === 0 || hasClass(n, 'case')) &&
-        select(home, 'a').some(a => under(a, n) && a.attrs.href === CASES[i]) &&
+        select(home, 'a').some(a => under(a, n) && a.attrs.href === (i === 0 ? 'irw/' : CASES[i])) &&
         select(home, 'a').some(a => under(a, n) && a.attrs.href === REPOSITORIES[i])),
     'Exactly three distinct case articles, IRW first, each linked to its own local case and authentic repository.');
     const irw = docs.get('irw/index.html').text;
@@ -213,8 +218,69 @@ export function runPortableValidation() {
     const contact = one(home.nodes, n => hasClass(n, 'connect-links'));
     check('V3_CONTACT_CHANNELS', contact && same(select(home, 'a').filter(a => under(a, contact)).map(a => a.attrs.href), [LINKEDIN, PROFILE]), 'Homepage contact block contains exactly the approved LinkedIn and GitHub links.');
 
+
+    // Current navigation and exact evidence destinations are a bounded successor
+    // to the five newly migrated legacy assertions. Other legacy failures carry forward.
+    const substantive = ['index.html', ...CASES];
+    const routePaths = ['/irw/', '/projects/workflow-intake-analysis.html', '/projects/saas-integration-reliability-support-troubleshooting.html'];
+    const navNames = ['Implementation readiness', 'Data quality', 'Integration reliability'];
+    const tidy = s => s.replace(/\s+/g, ' ').trim();
+    const routeOf = (a, p) => new URL(a.attrs.href, `${ORIGIN}/${p}`).pathname.replace(/index\.html$/, '');
+    const navLinks = (d, label) => { const n = one(select(d, 'nav'), x => x.attrs['aria-label'] === label); return n ? select(d, 'a').filter(a => under(a, n)) : []; };
+    check('V3_PRIMARY_NAVIGATION', substantive.every((p, i) => {
+      const d = docs.get(p), links = navLinks(d, 'Primary navigation');
+      if (links.length !== 3 || links.some((a, j) => routeOf(a, p) !== routePaths[j] || tidy(a.text) !== navNames[j] || a.attrs.href.startsWith('#'))) return false;
+      const current = links.filter(a => a.attrs['aria-current'] !== undefined);
+      return i === 0 ? current.length === 0 : current.length === 1 && current[0].attrs['aria-current'] === 'page' && routeOf(current[0], p) === routePaths[i - 1];
+    }), 'Three consistently ordered direct case destinations, with correct active-page semantics.');
+    check('V3_PROFESSIONAL_LINKS', substantive.every(p => {
+      const links = navLinks(docs.get(p), 'Professional links');
+      return links.length === 2 && links[0].attrs.href === LINKEDIN && links[1].attrs.href === PROFILE;
+    }), 'LinkedIn and GitHub remain separately labeled professional destinations.');
+    const homeSections = ['#background', '#independent-work', '#work', '#approach', '#learning', '#connect'];
+    check('V3_PAGE_OUTLINES', substantive.every(p => {
+      const d = docs.get(p), links = navLinks(d, 'On this page');
+      return links.length >= 5 && links.every(a => a.attrs.href.startsWith('#') && d.nodes.some(n => n.attrs.id === a.attrs.href.slice(1))) &&
+        (p !== 'index.html' || links.map(a => a.attrs.href).join('|') === homeSections.join('|'));
+    }), 'Clearly labeled page outlines use existing fragments in the intended order.');
+    const heroActions = one(home.nodes, n => hasClass(n, 'hero-actions'));
+    const opening = select(home, 'a').filter(a => heroActions && under(a, heroActions));
+    check('V3_OPENING_CASE_ACTIONS', opening.length === 2 && routeOf(opening[0], 'index.html') === '/irw/' &&
+      /Read the implementation-readiness case/.test(opening[0].text) && opening[1].attrs.href === '#work' && /on this page/.test(opening[1].text),
+    'Opening action opens the flagship; secondary action explicitly stays on this page.');
+    check('V3_CASE_DISCOVERY', articles.every((n, i) => {
+      const links = select(home, 'a').filter(a => under(a, n));
+      return links.filter(a => routeOf(a, 'index.html') === routePaths[i]).length === 2 &&
+        links.some(a => a.attrs.href === REPOSITORIES[i] && /View .* evidence on GitHub/.test(tidy(a.text)));
+    }), 'Each card offers a linked case label, a case action and a readable source action.');
+    const expectedArtifacts = [
+      ['irw/index.html', REPOSITORIES[0], ['evidence/uat-cases-results.csv', 'evidence/defect-retests.csv']],
+      ['projects/workflow-intake-analysis.html', REPOSITORIES[1], ['reports/examples/sql/summary_metrics.csv', 'reports/examples/sql/review_required_records.csv']],
+      ['projects/saas-integration-reliability-support-troubleshooting.html', REPOSITORIES[2], ['evidence/execution-and-reconciliation.json', 'evidence/structured-execution-trace.jsonl']],
+    ];
+    check('V3_DIRECT_ARTIFACTS', expectedArtifacts.every(([p, repo, paths]) => paths.every(file => {
+      const matches = select(docs.get(p), 'a').filter(a => a.attrs.href === `${repo}/blob/main/${file}`);
+      return matches.length === 1 && /\((?:CSV|JSON|JSONL)\)/.test(matches[0].text);
+    })), 'Exactly one descriptive link to each of the six selected public evidence files.');
+    const foundation = one(docs.get('irw/index.html').nodes, n => n.attrs.id === 'foundation-artifacts');
+    check('V3_ARTIFACT_CONTEXT', foundation && /eight-case platform-neutral model/.test(foundation.text) && /not the test records for the separate ten-case/.test(foundation.text),
+    'Public foundation files are not misrepresented as ten-case Atlassian test evidence.');
+    check('V3_NO_EM_DASHES', HTML.every(p => !/\u2014|&mdash;?|&#0*8212;?|&#x0*2014;?/i.test(text(`src/${p}`) + text(`dist/${p}`))),
+    'Site HTML and metadata contain no literal or encoded em dash.');
+    const legacyRedirect = text('dist/projects/implementation-readiness-support-transition.html');
+    check('V3_CANONICAL_CASE_LINKS', substantive.every(p => select(docs.get(p), 'a').every(a => !a.attrs.href?.includes('implementation-readiness-support-transition.html'))) &&
+      /http-equiv="refresh" content="0; url=\.\.\/irw\/"/.test(legacyRedirect),
+    'New internal links use the direct IRW route while the original legacy redirect remains available.');
+
     const prohibited = [], linkErrors = [];
-    const allowed = new Set([...REPOSITORIES, LINKEDIN, PROFILE, 'https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169']);
+    const allowed = new Set([...REPOSITORIES, LINKEDIN, PROFILE, 'https://tyler-windes.atlassian.net/wiki/spaces/~7120203b004a0c07184b39860e66e497b78dd0/pages/426169',
+      "https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/uat-cases-results.csv",
+      "https://github.com/Tyler-Windes/implementation-readiness-support-transition/blob/main/evidence/defect-retests.csv",
+      "https://github.com/Tyler-Windes/workflow-intake-analysis-demo/blob/main/reports/examples/sql/summary_metrics.csv",
+      "https://github.com/Tyler-Windes/workflow-intake-analysis-demo/blob/main/reports/examples/sql/review_required_records.csv",
+      "https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting/blob/main/evidence/execution-and-reconciliation.json",
+      "https://github.com/Tyler-Windes/saas-integration-reliability-support-troubleshooting/blob/main/evidence/structured-execution-trace.jsonl",
+    ]);
     for (const [path, doc] of docs) {
       for (const n of doc.nodes) {
         if (['script','form','iframe','object','embed','base'].includes(n.tag) || Object.keys(n.attrs).some(k => /^on/i.test(k) || ['srcdoc','srcset','action','formaction'].includes(k))) prohibited.push(`${path}: ${n.tag}`);
