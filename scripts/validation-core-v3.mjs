@@ -228,7 +228,7 @@ export function runPortableValidation() {
     check('V3_HOME_CSS_ACCESSIBILITY', /:focus-visible/.test(homeCss) && /prefers-reduced-motion/.test(homeCss) && /@media/.test(homeCss), 'Homepage focus, reduced-motion and responsive controls preserved.');
     check('V3_EVIDENCE_DISCLOSURES', /30 SYNTHETIC RECORDS/.test(home.text) && /Rules satisfied\s*21/.test(home.text) && /More context needed\s*9/.test(home.text) &&
       /not a Jira screenshot/.test(home.text) && /ten-case fictional Atlassian layer and eight-case foundation are separate/.test(home.text) &&
-      /12\/12 expected outcomes; no live SaaS or n8n execution/.test(home.text) && /not Amkha deployments or paid client implementations/.test(home.text),
+      /12\/12 expected outcomes; no live SaaS or n8n execution/.test(home.text) && /Each identifies its fictional scenario or synthetic data and the evidence supporting its results/.test(home.text),
     'Three illustrations and work samples retain their synthetic/local qualifications and distinct evidence sets.');
     check('V3_CREDENTIAL_SCOPE', ['Forge Fundamentals', 'BigQuery Data Skill Badge', 'Databricks'].every(s => home.text.includes(s)) &&
       !/PL-900|Workato|Looker skill badge earned/.test(home.text), 'Accepted compact awards remain distinct from planned awards; host evidence authenticity is an Owner preflight responsibility.');
